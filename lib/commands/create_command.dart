@@ -1,8 +1,14 @@
 import 'dart:io';
-
 import 'package:args/command_runner.dart';
+import 'package:path/path.dart' as p;
+import 'package:zuq_cli/generator/directory_generator.dart';
 
 class CreateCommand extends Command<int> {
+  CreateCommand({DirectoryGenerator? directoryGenerator})
+    : _directoryGenerator = directoryGenerator ?? const DirectoryGenerator();
+
+  final DirectoryGenerator _directoryGenerator;
+
   @override
   String get description => 'Create a new flutter application skeleton';
 
@@ -27,7 +33,13 @@ class CreateCommand extends Command<int> {
 
     if (process.exitCode == 0) {
       print(process.stdout);
-      print('Successfully created project $projectName');
+      final projectPath = p.join(Directory.current.path, projectName);
+      final libPath = p.join(projectPath, 'lib');
+      print('Generating base directory structure in $libPath...');
+
+      await _directoryGenerator.generate(libPath);
+
+      print('\nSuccessfully created project $projectName');
       return 0;
     } else {
       print('Error Scaffolding project:');
