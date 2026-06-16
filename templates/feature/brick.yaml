@@ -1,0 +1,9 @@
+name: feature
+description: Generates clean-architecture feature layers (domain, data, presentation) for a feature.
+version: 0.1.0+1
+vars:
+  name:
+    type: string
+    description: The name of the feature (e.g. authentication, cart).
+    prompt: What is the name of the feature?
+    

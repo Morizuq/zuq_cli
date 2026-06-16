@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 import 'package:zuq_cli/generator/directory_generator.dart';
+import 'package:zuq_cli/generator/template_generator.dart';
 
 class CreateCommand extends Command<int> {
   CreateCommand({DirectoryGenerator? directoryGenerator})
@@ -38,6 +39,12 @@ class CreateCommand extends Command<int> {
       print('Generating base directory structure in $libPath...');
 
       await _directoryGenerator.generate(libPath);
+
+      final templateGen = const TemplateGenerator();
+      await templateGen.generateFeature(
+        targetDirectory: p.join(libPath, 'features'),
+        featureName: 'auth',
+      );
 
       print('\nSuccessfully created project $projectName');
       return 0;
