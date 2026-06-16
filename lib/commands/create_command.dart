@@ -1,12 +1,20 @@
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:zuq_cli/core/config/config_parser.dart';
 import 'package:zuq_cli/generator/project_generator.dart';
 
 class CreateCommand extends Command<int> {
   final ProjectGenerator _projectGenerator;
-  CreateCommand({ProjectGenerator? projectGenerator})
-    : _projectGenerator =
-          projectGenerator ?? ProjectGenerator(logger: Logger()) {
+  final ConfigParser _configParser;
+  final Logger _logger;
+  CreateCommand({
+    ProjectGenerator? projectGenerator,
+    ConfigParser configParser = const ConfigParser(),
+    Logger? logger,
+  }) : _projectGenerator =
+           projectGenerator ?? ProjectGenerator(logger: Logger()),
+       _configParser = configParser,
+       _logger = logger ?? Logger() {
     // Add state management choise option
 
     argParser.addOption(
@@ -35,19 +43,39 @@ class CreateCommand extends Command<int> {
   @override
   Future<int> run() async {
     if (argResults == null || argResults!.rest.isEmpty) {
-      print('Error: Please specifiy project name');
-      print('Usage: zuq create <project_name>');
+      _logger.err('Error: Please specifiy project name');
+      _logger.info('Usage: zuq create <project_name>');
       return 1;
     }
 
-    final stateManagement = argResults?['state'] as String;
     final projectName = argResults!.rest.first;
-    final router = argResults?['router'] as String;
+
+    final fileConfig = _configParser.readConfig(
+      fallbackProjectName: projectName,
+    );
+
+    final String finalState;
+    final String finalRouter;
+    final String finalName;
+
+    if (fileConfig != null) {
+      _logger.info('Using configuration from zuq.yaml');
+      finalName = fileConfig.projectName;
+      finalState = fileConfig.stateManagement;
+      finalRouter = fileConfig.router;
+    } else {
+      _logger.info(
+        'No configuration file found. Using command line arguments.',
+      );
+      finalName = projectName;
+      finalState = argResults?['state'] as String;
+      finalRouter = argResults?['router'] as String;
+    }
 
     return await _projectGenerator.generate(
-      projectName: projectName,
-      stateManagement: stateManagement,
-      router: router,
+      projectName: finalName,
+      stateManagement: finalState,
+      router: finalRouter,
     );
   }
 }

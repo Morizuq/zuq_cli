@@ -53,6 +53,18 @@ class ProjectGenerator {
     final projectPath = p.join(Directory.current.path, projectName);
     final libPath = p.join(projectPath, 'lib');
 
+    // - Create a local zuq.yaml inside the new project for future commands
+    final configProgress = _logger.progress('Creating project config file');
+
+    final projectConfigFile = File(p.join(projectPath, 'zuq.yaml'));
+    projectConfigFile.writeAsStringSync('''
+      name: $projectName
+      state_management: $stateManagement
+      router: $router
+      ''');
+
+    configProgress.complete('zuq.yaml created inside the project.');
+
     // - Clean default main.dart
     final defaultMain = File(p.join(libPath, 'main.dart'));
 

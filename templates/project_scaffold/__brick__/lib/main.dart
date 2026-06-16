@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 {{#isRiverpod}}import 'package:flutter_riverpod/flutter_riverpod.dart';{{/isRiverpod}}
-{{#isBloc}}import 'package:flutter_bloc/flutter_bloc.dart';{{/isBloc}}
-{{#isProvider}}import 'package:provider/provider.dart';{{/isProvider}}
-import 'core/router/router.dart';
+{{#isProvider}}import 'package:provider/provider.dart';{{/isProvider}}import 'core/router/router.dart';
 
 void main() {
   runApp(
-    {{#isRiverpod}}const ProviderScope(child: MyApp()){{/isRiverpod}}
-    {{#isBloc}}const MyApp(){{/isBloc}}
-    {{#isProvider}}MultiProvider(providers: const [], child: const MyApp()){{/isProvider}}
-    {{#isNone}}const MyApp(){{/isNone}}
+    {{#isRiverpod}}const ProviderScope(child: MyApp()){{/isRiverpod}}{{#isBloc}}const MyApp(){{/isBloc}}{{#isProvider}}MultiProvider(providers: const [], child: const MyApp()){{/isProvider}}{{#isNone}}const MyApp(){{/isNone}}
   );
 }
 
