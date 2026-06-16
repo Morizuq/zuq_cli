@@ -1,10 +1,12 @@
 import 'package:args/command_runner.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:zuq_cli/generator/project_generator.dart';
 
 class CreateCommand extends Command<int> {
   final ProjectGenerator _projectGenerator;
-  CreateCommand({ProjectGenerator projectGenerator = const ProjectGenerator()})
-    : _projectGenerator = projectGenerator {
+  CreateCommand({ProjectGenerator? projectGenerator})
+    : _projectGenerator =
+          projectGenerator ?? ProjectGenerator(logger: Logger()) {
     // Add state management choise option
 
     argParser.addOption(

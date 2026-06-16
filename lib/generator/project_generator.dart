@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:mason_logger/mason_logger.dart';
 import 'package:zuq_cli/core/dependency_resolver.dart';
 import 'package:zuq_cli/core/process_runner.dart';
 import 'package:zuq_cli/generator/directory_generator.dart';
@@ -12,25 +13,30 @@ class ProjectGenerator {
   final TemplateGenerator _templateGenerator;
   final DependencyResolver _dependencyResolver;
   final ProcessRunner _processRunner;
+  final Logger _logger;
 
-  const ProjectGenerator({
+  ProjectGenerator({
     DirectoryGenerator directoryGenerator = const DirectoryGenerator(),
     TemplateGenerator templateGenerator = const TemplateGenerator(),
     DependencyResolver dependencyResolver = const DependencyResolver(),
     ProcessRunner processRunner = const ProcessRunner(),
+    Logger? logger,
   }) : _directoryGenerator = directoryGenerator,
        _templateGenerator = templateGenerator,
        _dependencyResolver = dependencyResolver,
-       _processRunner = processRunner;
+       _processRunner = processRunner,
+       _logger = logger ?? Logger();
 
   Future<int> generate({
     required String projectName,
     required String stateManagement,
     required String router,
   }) async {
-    print('Scaffolding new Flutter project: $projectName');
+    _logger.info('Scaffolding project ${lightCyan.wrap(projectName)}...');
 
     // - Run flutter create
+    final createProgress = _logger.progress('Running "flutter create"');
+
     final createResult = await _processRunner.run('flutter', [
       'create',
       projectName,
@@ -42,7 +48,7 @@ class ProjectGenerator {
       return createResult.exitCode;
     }
 
-    print(createResult.stdout);
+    createProgress.complete('Flutter project created.');
 
     final projectPath = p.join(Directory.current.path, projectName);
     final libPath = p.join(projectPath, 'lib');
@@ -53,9 +59,12 @@ class ProjectGenerator {
     if (defaultMain.existsSync()) {
       defaultMain.deleteSync();
     }
-
-    print('Generating base directory structure in $libPath...');
+    // - Generate Directory Structure
+    final structProgress = _logger.progress(
+      'Generating base directory structure',
+    );
     await _directoryGenerator.generate(libPath);
+    structProgress.complete('Base directory structure generated.');
 
     final isRiverpod = stateManagement == 'riverpod';
     final isBloc = stateManagement == 'bloc';
@@ -65,6 +74,9 @@ class ProjectGenerator {
     final isGoRouter = router == 'go_router';
     final isAutoRoute = router == 'auto_route';
 
+    final masonProgress = _logger.progress(
+      'Generating architecture templates via Mason',
+    );
     await _templateGenerator.generateProjectCore(
       projectPath: projectPath,
       projectName: projectName,
@@ -75,6 +87,7 @@ class ProjectGenerator {
       isGoRouter: isGoRouter,
       isAutoRoute: isAutoRoute,
     );
+    masonProgress.complete('Architecture templates generated.');
 
     // - Resolve and Install deps
     final corePackages = _dependencyResolver.resolveCorePackages(
@@ -84,20 +97,25 @@ class ProjectGenerator {
     final devPackages = _dependencyResolver.resolveDevPackages(router: router);
 
     // - Install core packages
-    print('Installing core packages: ${corePackages.join(', ')}...');
+    final coreInstallProgress = _logger.progress(
+      'Installing core packages: ${corePackages.join(', ')}',
+    );
     final coreResult = await _processRunner.run('flutter', [
       'pub',
       'add',
       ...corePackages,
     ], workingDirectory: projectPath);
     if (coreResult.exitCode != 0) {
-      print('Error installing core packages:\n${coreResult.stderr}');
+      coreInstallProgress.fail('Failed to install core packages.');
       return coreResult.exitCode;
     }
+    coreInstallProgress.complete('Core packages installed.');
 
     // - Install dev packages if needed
     if (devPackages.isNotEmpty) {
-      print('Installing dev packages: ${devPackages.join(', ')}');
+      final devInstallProgress = _logger.progress(
+        'Installing dev packages: ${devPackages.join(', ')}',
+      );
       final devResult = await _processRunner.run('flutter', [
         'pub',
         'add',
@@ -106,15 +124,20 @@ class ProjectGenerator {
       ]);
 
       if (devResult.exitCode != 0) {
-        print('Error installing dev packages.');
-        print(devResult.stderr);
+        devInstallProgress.fail('Failed to install dev packages.');
         return devResult.exitCode;
       }
+      devInstallProgress.complete('Dev packages installed.');
     }
 
-    print('\nSuccessfully created project $projectName');
-    print('Navigate to project directory: cd $projectName');
-    print('Run "flutter run" to start the application.');
+    _logger.success('\nSuccessfully created project $projectName!');
+    _logger.info(
+      'Navigate to project directory: ${lightCyan.wrap('cd $projectName')}',
+    );
+    _logger.info(
+      'Run ${lightGreen.wrap('flutter run')} to start the application.',
+    );
+
     return 0;
   }
 }

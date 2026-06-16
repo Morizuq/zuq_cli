@@ -1,4 +1,3 @@
-// templates/project_scaffold/__brick__/main.dart
 import 'package:flutter/material.dart';
 {{#isRiverpod}}import 'package:flutter_riverpod/flutter_riverpod.dart';{{/isRiverpod}}
 {{#isBloc}}import 'package:flutter_bloc/flutter_bloc.dart';{{/isBloc}}
