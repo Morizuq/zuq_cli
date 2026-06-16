@@ -1,0 +1,30 @@
+name: project_scaffold
+description: Generates the core application structure based on selected state management strategy.
+version: 0,1,0+1
+vars:
+  name: 
+    type: string
+  isRiverpod:
+    type: boolean
+    default: false
+    prompt: Use Riverpod for state management?
+  isBloc:
+    type: boolean
+    default: false
+    prompt: Use Bloc for state management?
+  isProvider:
+    type: boolean
+    default: false
+    prompt: Use Provider for state management?
+  isNone:
+    type: boolean
+    default: false
+    prompt: Use no state management?
+  isGoRouter:
+    type: boolean
+    default: false
+    prompt: Use GoRouter for routing?
+  isAutoRoute:
+    type: boolean
+    default: false
+    prompt: Use AutoRoute for routing?

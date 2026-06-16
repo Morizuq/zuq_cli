@@ -28,4 +28,40 @@ class TemplateGenerator {
 
     print('Generated feature $featureName template successfully');
   }
+
+  Future<void> generateProjectCore({
+    required String projectPath,
+    required String projectName,
+    required bool isRiverpod,
+    required bool isBloc,
+    required bool isProvider,
+    required bool isNone,
+    required bool isGoRouter,
+    required bool isAutoRoute,
+  }) async {
+    final brikPath = p.join(
+      Directory.current.path,
+      'templates',
+      'project_scaffold',
+    );
+    final brick = Brick.path(brikPath);
+    final generator = await MasonGenerator.fromBrick(brick);
+    final variables = <String, dynamic>{
+      'name': projectName,
+      'isRiverpod': isRiverpod,
+      'isBloc': isBloc,
+      'isProvider': isProvider,
+      'isNone': isNone,
+      'isGoRouter': isGoRouter,
+      'isAutoRoute': isAutoRoute,
+    };
+
+    final target = DirectoryGeneratorTarget(Directory(projectPath));
+
+    print('Generating project core $projectName template via Mason');
+
+    await generator.generate(target, vars: variables, logger: Logger());
+
+    print('Generated project core $projectName template successfully');
+  }
 }
