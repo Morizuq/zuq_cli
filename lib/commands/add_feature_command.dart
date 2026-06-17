@@ -54,6 +54,10 @@ class AddFeatureCommand extends Command<int> {
 
       final variables = <String, dynamic>{
         'name': featureName,
+        'isRiverpod': projectConfig.stateManagement == 'riverpod',
+        'isBloc': projectConfig.stateManagement == 'bloc',
+        'isProvider': projectConfig.stateManagement == 'provider',
+        'isNone': projectConfig.stateManagement == 'none',
       };
 
       // Target lib/features folder

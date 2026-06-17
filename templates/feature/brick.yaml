@@ -6,4 +6,16 @@ vars:
     type: string
     description: The name of the feature (e.g. authentication, cart).
     prompt: What is the name of the feature?
+  isRiverpod:
+    type: boolean
+    default: false
+  isBloc:
+    type: boolean
+    default: false
+  isProvider:
+    type: boolean
+    default: false
+  isNone:
+    type: boolean
+    default: true
     

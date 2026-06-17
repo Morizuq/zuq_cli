@@ -144,7 +144,7 @@ $modulesBlock
     if (stateManagement == 'riverpod') {
       context.corePackages.add('flutter_riverpod');
     } else if (stateManagement == 'bloc') {
-      context.corePackages.add('flutter_bloc');
+      context.corePackages.addAll(['flutter_bloc', 'equatable']);
     } else if (stateManagement == 'provider') {
       context.corePackages.add('provider');
     }
