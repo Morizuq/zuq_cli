@@ -1,6 +1,7 @@
 import 'package:args/command_runner.dart';
 import 'package:zuq_cli/commands/create_command.dart';
 import 'package:zuq_cli/commands/add_command.dart';
+import 'package:zuq_cli/commands/doctor_command.dart';
 
 class ZuqCli {
   final CommandRunner<int> runner;
@@ -12,6 +13,7 @@ class ZuqCli {
       ) {
     runner.addCommand(CreateCommand());
     runner.addCommand(AddCommand());
+    runner.addCommand(DoctorCommand());
   }
 
   // Entry point to execute commands
