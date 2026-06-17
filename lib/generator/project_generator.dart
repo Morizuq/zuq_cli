@@ -77,14 +77,14 @@ class ProjectGenerator {
     final List<String> initialModules;
     switch (preset.toLowerCase()) {
       case 'fintech':
-        initialModules = ['routing', 'networking', 'storage'];
+        initialModules = ['routing', 'networking', 'storage', 'theme'];
         break;
       case 'ecommerce':
-        initialModules = ['routing', 'networking', 'storage', 'analytics'];
+        initialModules = ['routing', 'networking', 'storage', 'analytics', 'theme'];
         break;
       case 'default':
       default:
-        initialModules = ['routing'];
+        initialModules = ['routing', 'theme'];
         break;
     }
 

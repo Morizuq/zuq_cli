@@ -52,6 +52,8 @@ class ThemeProvider extends ChangeNotifier {
 }
 {{/isProvider}}
 {{#isNone}}
+final themeNotifier = ThemeNotifier();
+
 class ThemeNotifier extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
 
