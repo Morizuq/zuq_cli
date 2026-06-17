@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 import 'package:path/path.dart' as p;
 
 class TemplatesLocator {
@@ -6,11 +7,15 @@ class TemplatesLocator {
 
   static String getTemplatesPath() {
     try {
-      final scriptPath = Platform.script.toFilePath();
-      final rootDir = File(scriptPath).parent.parent.path;
-      final templatesDir = Directory(p.join(rootDir, 'templates'));
-      if (templatesDir.existsSync()) {
-        return templatesDir.path;
+      final entryPointUri = Uri.parse('package:zuq_cli/zuq_cli.dart');
+      final resolvedUri = Isolate.resolvePackageUriSync(entryPointUri);
+      if (resolvedUri != null) {
+        final entryPointPath = resolvedUri.toFilePath();
+        final rootDir = File(entryPointPath).parent.parent.path;
+        final templatesDir = Directory(p.join(rootDir, 'templates'));
+        if (templatesDir.existsSync()) {
+          return templatesDir.path;
+        }
       }
     } catch (_) {
       // Ignored: fallback to current directory
