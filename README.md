@@ -1,73 +1,68 @@
 # Zuq CLI ⚡
-### *The flexible, boundary-enforcing companion for Flutter Clean Architecture.*
+
+**The flexible, boundary-enforcing scaffold tool for Flutter Clean Architecture.**
 
 [![Pub Version](https://img.shields.io/pub/v/zuq_cli?color=blue)](https://pub.dev/packages/zuq_cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Zuq CLI** is a developer experience (DX) tool written in Dart, designed to scaffold, extend, and enforce architectural boundaries in Clean Architecture-based Flutter applications. 
-
-Zuq provides developer choice and architectural flexibility by natively supporting popular state management options (**BLoC**, **Riverpod**, and **Provider**) and routing libraries (**GoRouter** and **AutoRoute**), all while enforcing consistency and safety through automated compliance auditing.
+Zuq is a Dart CLI that scaffolds, extends, and audits Clean Architecture Flutter projects. It natively supports **BLoC**, **Riverpod**, and **Provider** for state management, and **GoRouter** or **AutoRoute** for routing — enforcing architectural boundaries through every step of development.
 
 ---
 
-## 🎯 Key Features
+## Features
 
-*   **⚡ Flexible Scaffolding:** Create structured Flutter skeletons with your choice of State Management and Router libraries. Supports industry presets like `fintech` and `ecommerce`.
-*   **🩺 Boundary Auditing (`zuq doctor`):** A static analyzer that audits your `lib/features` directory to prevent architectural drift (e.g. domain layers importing data/presentation layers). Perfect for Git hooks and CI pipelines.
-*   **📦 Topological Module Installer (`zuq add module`):** Safely add pre-configured modules (Networking, Storage, L10n, Analytics, etc.) using a built-in topological dependency resolver that resolves execution order and prevents cyclic dependencies.
-*   **📂 Feature Scaffolding (`zuq add feature`):** Generate complete Clean Architecture slices (domain, data, and presentation folders) matching your project's active state management library with a single command.
+- **Flexible scaffolding** — bootstrap full project skeletons with your preferred state management and router. Includes `fintech` and `ecommerce` presets.
+- **Boundary auditing** — `zuq doctor` statically analyzes your codebase and flags any layer that imports what it shouldn't. Designed for Git hooks and CI.
+- **Modular installer** — add pre-configured modules (networking, storage, analytics, etc.) with a topological dependency resolver that handles install order and prevents cyclic bugs.
+- **Feature generator** — scaffold a complete Clean Architecture slice (domain, data, presentation) with a single command.
 
 ---
 
-## 🚀 Installation
+## Installation
 
-### Global Activation (Once Published)
 ```bash
+# Once published
 dart pub global activate zuq_cli
-```
 
-### From Local Source (For Development)
-Clone this repository and run the following command in the root folder:
-```bash
+# From local source
 dart pub global activate --source path .
 ```
 
 ---
 
-## 🛠️ CLI Commands & Usage
+## Commands
 
-### 1. Initialize a Project: `zuq create`
-Scaffolds a new Flutter project skeleton. If options are omitted and you are in an interactive terminal, you will be prompted.
+### `zuq create` — Bootstrap a project
 
 ```bash
 zuq create <project_name> [flags]
 ```
 
-#### Available Flags:
-| Flag | Abbreviation | Allowed Values | Default | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `--state` | `-s` | `riverpod`, `bloc`, `provider`, `none` | `none` | The state management engine |
-| `--router` | `-r` | `go_router`, `auto_route` | `go_router` | The routing solution to use |
-| `--preset` | `-p` | `default`, `fintech`, `ecommerce` | `default` | Preset architectural template |
-| `--platforms` | | `android`, `ios`, `web`, `macos`, `linux`, `windows` | `android`, `ios` | Targeted platforms |
+| Flag | Short | Values | Default | Description |
+| :--- | :---: | :--- | :---: | :--- |
+| `--state` | `-s` | `bloc` `riverpod` `provider` `none` | `none` | State management library |
+| `--router` | `-r` | `go_router` `auto_route` | `go_router` | Routing solution |
+| `--preset` | `-p` | `default` `fintech` `ecommerce` | `default` | Architectural template |
+| `--platforms` | | `android` `ios` `web` `macos` `linux` `windows` | `android,ios` | Target platforms |
 
-*Example:*
 ```bash
-zuq create my_awesome_app --state riverpod --router go_router --platforms android ios web
+zuq create my_app --state bloc --router go_router --platforms android ios web
 ```
+
+If flags are omitted in an interactive terminal, Zuq will prompt you.
 
 ---
 
-### 2. Scaffold a Feature: `zuq add feature`
-Generates a complete Clean Architecture slice for a specific feature.
+### `zuq add feature` — Generate a feature slice
+
+Generates a full Clean Architecture feature under `lib/features/<feature_name>`:
 
 ```bash
 zuq add feature <feature_name>
 ```
 
-This generates the following structure under `lib/features/<feature_name>`:
-```text
-lib/features/my_feature/
+```
+lib/features/auth/
 ├── data/
 │   ├── datasources/
 │   ├── models/
@@ -78,63 +73,67 @@ lib/features/my_feature/
 │   └── usecases/
 └── presentation/
     ├── pages/
-    ├── state/       # Prepopulated with Riverpod/BLoC/Provider boilerplate
+    ├── state/        ← pre-populated with BLoC / Riverpod / Provider boilerplate
     └── widgets/
 ```
 
 ---
 
-### 3. Install Core Modules: `zuq add module`
-Adds pre-configured architectural modules. Zuq automatically reads your project context (via `zuq.yaml`), injects code templates, and runs `flutter pub add` for required dependencies.
+### `zuq add module` — Install a core module
+
+Adds a pre-configured architectural module. Zuq reads your `zuq.yaml`, injects the right templates, and runs `flutter pub add` for you.
 
 ```bash
 zuq add module <module_name>
 ```
 
-#### Available Modules:
-*   `networking` (depends on: `storage`, `analytics`) — Sets up a pre-configured `Dio` client, interceptors, and error handling.
-*   `storage` — Configures secure and localized storage utilities.
-*   `routing` — Auto-generates router setups based on GoRouter/AutoRoute choices.
-*   `theme` — Sets up dark/light mode token structures.
-*   `l10n` — Sets up standard localized resource structures.
-*   `analytics` — Core telemetry tracking layout.
+| Module | Depends on | What it sets up |
+| :--- | :--- | :--- |
+| `networking` | `storage`, `analytics` | Dio client, interceptors, error handling |
+| `storage` | — | Secure and local storage utilities |
+| `routing` | — | Router setup based on your GoRouter/AutoRoute choice |
+| `theme` | — | Dark/light mode token structure |
+| `l10n` | — | Localization resource structure |
+| `analytics` | — | Core telemetry tracking layout |
 
-> [!TIP]
-> **Topological Ordering:** If you add the `networking` module, Zuq will automatically resolve dependencies and install `storage` and `analytics` first in the correct order, avoiding cyclic bugs.
+> **Topological ordering** — adding `networking` automatically installs `storage` and `analytics` first, in the correct order.
 
 ---
 
-### 4. Audit Boundaries: `zuq doctor`
-Runs static analysis checks against your project's clean-architecture boundaries. If any developer violates boundary constraints, it flags the file, line number, import source, and triggers a build failure code (`exit 1`).
+### `zuq doctor` — Audit architectural boundaries
+
+Scans your `lib/features` directory and flags any layer importing what it's not allowed to.
 
 ```bash
 zuq doctor
 ```
 
-#### Enforced Import Boundaries:
-```mermaid
-graph TD
-    Presentation[Presentation Layer] --> Domain[Domain Layer]
-    Data[Data Layer] --> Domain[Domain Layer]
-    Domain -->|BANNED| Presentation
-    Domain -->|BANNED| Data
-    Presentation -->|BANNED| Data
-    Data -->|BANNED| Presentation
+On a violation, Zuq outputs the file path, line number, and the offending import — then exits with code `1`.
+
+**Enforced rules:**
+
+```
+Presentation  →  Domain     ✅
+Data          →  Domain     ✅
+Domain        →  Data        ✗
+Domain        →  Presentation ✗
+Presentation  →  Data        ✗
+Data          →  Presentation ✗
 ```
 
-*   **Domain:** Must be completely independent. It is prohibited from importing files from the `presentation` or `data` layers.
-*   **Presentation:** Can only import from the `domain` layer (e.g. use cases, entities). Direct imports from `data` repositories/datasources are banned.
-*   **Data:** Can only import interfaces from the `domain` layer. It cannot import code from the `presentation` layer.
+- **Domain** must be completely framework-agnostic — no imports from `data` or `presentation`.
+- **Presentation** may only import from `domain` (use cases, entities). Direct `data` layer imports are banned.
+- **Data** may only import interfaces from `domain`. No `presentation` imports.
 
 ---
 
-## ⚙️ Configuration File: `zuq.yaml`
+## Configuration — `zuq.yaml`
 
-When you scaffold a project with `zuq create`, a `zuq.yaml` configuration file is generated in the root directory. This tells the CLI how to manage future additions:
+Created automatically on `zuq create`. Referenced by all subsequent `zuq add` commands.
 
 ```yaml
-name: my_awesome_app
-state_management: riverpod
+name: my_app
+state_management: bloc
 router: go_router
 preset: default
 modules:
@@ -145,13 +144,12 @@ modules:
 
 ---
 
-## 🛡️ Preventing Architectural Drift in CI
-Integrate `zuq doctor` into your continuous integration flow to make sure no pull requests bypass architectural boundaries.
+## CI Integration
 
-Add this step to your GitHub Actions workflow:
+Add `zuq doctor` to your GitHub Actions workflow to block any PR that violates layer boundaries:
 
 ```yaml
-name: Architectural Compliance Audit
+name: Architecture Audit
 
 on: [push, pull_request]
 
@@ -162,25 +160,26 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
       - name: Install Zuq CLI
-        run: dart pub global activate --source path ./zuq_cli # Or 'dart pub global activate zuq_cli' once published
-      - name: Run Architecture Audit
+        run: dart pub global activate zuq_cli
+      - name: Run boundary audit
         run: zuq doctor
 ```
 
 ---
 
-## 🤝 Contributing
-Contributions are always welcome! Feel free to open issues, request additional state management integrations, or suggest improvements to the boundary checking engine.
+## Contributing
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m 'Add your feature'`
+4. Push and open a pull request
+
+Issues, state management integration requests, and improvements to the boundary engine are all welcome.
 
 ---
 
-## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
+## License
+
+MIT — see [LICENSE](./LICENSE) for details.
