@@ -1,7 +1,7 @@
 name: zuq_cli
-description: A sample command-line application.
+description: A command-line interface to scaffold, extend, and audit Flutter Clean Architecture projects.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/Morizuq/zuq_cli
 
 environment:
   sdk: ^3.11.5
