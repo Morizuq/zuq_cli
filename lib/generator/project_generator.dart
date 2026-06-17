@@ -37,16 +37,20 @@ class ProjectGenerator {
     required String stateManagement,
     required String router,
     String preset = 'default',
+    List<String> platforms = const [],
   }) async {
     _logger.info('Scaffolding project ${lightCyan.wrap(projectName)}...');
 
     // - Run flutter create
     final createProgress = _logger.progress('Running "flutter create"');
 
-    final createResult = await _processRunner.run('flutter', [
-      'create',
-      projectName,
-    ]);
+    final List<String> args = ['create'];
+    if (platforms.isNotEmpty) {
+      args.add('--platforms=${platforms.join(',')}');
+    }
+    args.add(projectName);
+
+    final createResult = await _processRunner.run('flutter', args);
 
     if (createResult.exitCode != 0) {
       print('Error Scaffolding project.');

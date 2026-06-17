@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:zuq_cli/core/config/config_parser.dart';
@@ -39,6 +41,12 @@ class CreateCommand extends Command<int> {
       help: 'The preset architecture template to scaffold',
       allowed: ['default', 'fintech', 'ecommerce'],
       defaultsTo: 'default',
+    );
+
+    argParser.addMultiOption(
+      'platforms',
+      help: 'The platforms supported by this project.',
+      allowed: ['android', 'ios', 'web', 'macos', 'linux', 'windows'],
     );
   }
 
@@ -83,11 +91,25 @@ class CreateCommand extends Command<int> {
       finalPreset = argResults?['preset'] as String;
     }
 
+    List<String> finalPlatforms = argResults?['platforms'] as List<String>? ?? [];
+    if (finalPlatforms.isEmpty) {
+      if (stdin.hasTerminal) {
+        finalPlatforms = _logger.chooseAny(
+          'Select target platforms (use Space to select, Enter to confirm):',
+          choices: ['android', 'ios', 'web', 'macos', 'linux', 'windows'],
+          defaultValues: ['android', 'ios'],
+        );
+      } else {
+        finalPlatforms = ['android', 'ios', 'web', 'macos', 'linux', 'windows'];
+      }
+    }
+
     return await _projectGenerator.generate(
       projectName: finalName,
       stateManagement: finalState,
       router: finalRouter,
       preset: finalPreset,
+      platforms: finalPlatforms,
     );
   }
 }
