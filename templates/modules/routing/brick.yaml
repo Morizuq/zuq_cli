@@ -1,0 +1,12 @@
+name: routing_brick
+description: Generates routing configurations (GoRouter vs AutoRoute).
+version: 0.1.0+1
+vars:
+  name:
+    type: string
+  isGoRouter:
+    type: boolean
+    default: true
+  isAutoRoute:
+    type: boolean
+    default: false

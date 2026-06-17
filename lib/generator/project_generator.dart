@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:mason_logger/mason_logger.dart';
-import 'package:zuq_cli/core/dependency_resolver.dart';
+import 'package:zuq_cli/core/module/base/module.dart';
+import 'package:zuq_cli/core/module/base/project_context.dart';
+import 'package:zuq_cli/core/module/networking_module.dart';
+import 'package:zuq_cli/core/module/routing_module.dart';
 import 'package:zuq_cli/core/process_runner.dart';
 import 'package:zuq_cli/generator/directory_generator.dart';
 import 'package:zuq_cli/generator/template_generator.dart';
@@ -11,19 +14,16 @@ import 'package:path/path.dart' as p;
 class ProjectGenerator {
   final DirectoryGenerator _directoryGenerator;
   final TemplateGenerator _templateGenerator;
-  final DependencyResolver _dependencyResolver;
   final ProcessRunner _processRunner;
   final Logger _logger;
 
   ProjectGenerator({
     DirectoryGenerator directoryGenerator = const DirectoryGenerator(),
     TemplateGenerator templateGenerator = const TemplateGenerator(),
-    DependencyResolver dependencyResolver = const DependencyResolver(),
     ProcessRunner processRunner = const ProcessRunner(),
     Logger? logger,
   }) : _directoryGenerator = directoryGenerator,
        _templateGenerator = templateGenerator,
-       _dependencyResolver = dependencyResolver,
        _processRunner = processRunner,
        _logger = logger ?? Logger();
 
@@ -58,10 +58,10 @@ class ProjectGenerator {
 
     final projectConfigFile = File(p.join(projectPath, 'zuq.yaml'));
     projectConfigFile.writeAsStringSync('''
-      name: $projectName
-      state_management: $stateManagement
-      router: $router
-      ''');
+name: $projectName
+state_management: $stateManagement
+router: $router
+''');
 
     configProgress.complete('zuq.yaml created inside the project.');
 
@@ -78,62 +78,80 @@ class ProjectGenerator {
     await _directoryGenerator.generate(libPath);
     structProgress.complete('Base directory structure generated.');
 
-    final isRiverpod = stateManagement == 'riverpod';
-    final isBloc = stateManagement == 'bloc';
-    final isProvider = stateManagement == 'provider';
-    final isNone = stateManagement == 'none';
-
-    final isGoRouter = router == 'go_router';
-    final isAutoRoute = router == 'auto_route';
-
-    final masonProgress = _logger.progress(
-      'Generating architecture templates via Mason',
+    // - Generate Core Project Scaffold from brick
+    final scaffoldProgress = _logger.progress(
+      'Generating core project scaffold',
     );
-    await _templateGenerator.generateProjectCore(
-      projectPath: projectPath,
+    try {
+      await _templateGenerator.generateProjectCore(
+        projectPath: projectPath,
+        projectName: projectName,
+        isRiverpod: stateManagement == 'riverpod',
+        isBloc: stateManagement == 'bloc',
+        isProvider: stateManagement == 'provider',
+        isNone: stateManagement == 'none',
+        isGoRouter: router == 'go_router',
+        isAutoRoute: router == 'auto_route',
+      );
+      scaffoldProgress.complete('Core project scaffold generated.');
+    } catch (e) {
+      scaffoldProgress.fail('Failed to generate core project scaffold: $e');
+      return 1;
+    }
+
+    final context = ProjectContext(
       projectName: projectName,
-      isRiverpod: isRiverpod,
-      isBloc: isBloc,
-      isProvider: isProvider,
-      isNone: isNone,
-      isGoRouter: isGoRouter,
-      isAutoRoute: isAutoRoute,
-    );
-    masonProgress.complete('Architecture templates generated.');
-
-    // - Resolve and Install deps
-    final corePackages = _dependencyResolver.resolveCorePackages(
+      projectPath: projectPath,
       stateManagement: stateManagement,
       router: router,
     );
-    final devPackages = _dependencyResolver.resolveDevPackages(router: router);
 
-    // - Install core packages
-    final coreInstallProgress = _logger.progress(
-      'Installing core packages: ${corePackages.join(', ')}',
-    );
-    final coreResult = await _processRunner.run('flutter', [
-      'pub',
-      'add',
-      ...corePackages,
-    ], workingDirectory: projectPath);
-    if (coreResult.exitCode != 0) {
-      coreInstallProgress.fail('Failed to install core packages.');
-      return coreResult.exitCode;
+    // Add state management packages based on selection
+    if (stateManagement == 'riverpod') {
+      context.corePackages.add('flutter_riverpod');
+    } else if (stateManagement == 'bloc') {
+      context.corePackages.add('flutter_bloc');
+    } else if (stateManagement == 'provider') {
+      context.corePackages.add('provider');
     }
-    coreInstallProgress.complete('Core packages installed.');
+
+    final modules = <Module>[RoutingModule(), NetworkingModule()];
+
+    for (final module in modules) {
+      final moduleProgress = _logger.progress(
+        'Processing ${module.id} module...',
+      );
+      await module.install(context);
+      moduleProgress.complete('${module.id} module processed.');
+    }
+
+    if (context.corePackages.isNotEmpty) {
+      final coreInstallProgress = _logger.progress(
+        'Installing core packages: ${context.corePackages.join(', ')}',
+      );
+      final coreResult = await _processRunner.run('flutter', [
+        'pub',
+        'add',
+        ...context.corePackages,
+      ], workingDirectory: projectPath);
+      if (coreResult.exitCode != 0) {
+        coreInstallProgress.fail('Failed to install core packages.');
+        return coreResult.exitCode;
+      }
+      coreInstallProgress.complete('Core packages installed.');
+    }
 
     // - Install dev packages if needed
-    if (devPackages.isNotEmpty) {
+    if (context.devPackages.isNotEmpty) {
       final devInstallProgress = _logger.progress(
-        'Installing dev packages: ${devPackages.join(', ')}',
+        'Installing dev packages: ${context.devPackages.join(', ')}',
       );
       final devResult = await _processRunner.run('flutter', [
         'pub',
         'add',
         '--dev',
-        ...devPackages,
-      ]);
+        ...context.devPackages,
+      ], workingDirectory: projectPath);
 
       if (devResult.exitCode != 0) {
         devInstallProgress.fail('Failed to install dev packages.');

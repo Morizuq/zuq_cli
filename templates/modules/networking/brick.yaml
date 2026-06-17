@@ -1,0 +1,7 @@
+name: networking_brick
+description: Generates clean networking layers (dio client, constants, failures, interceptors).
+version: 0.1.0+1
+vars:
+  isRiverpod:
+    type: boolean
+    default: false
