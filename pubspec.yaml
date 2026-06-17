@@ -6,6 +6,9 @@ repository: https://github.com/Morizuq/zuq_cli
 environment:
   sdk: ^3.11.5
 
+executables:
+  zuq: zuq_cli
+
 # Add regular dependencies here.
 dependencies:
   args: ^2.7.0
