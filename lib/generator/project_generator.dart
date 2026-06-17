@@ -36,6 +36,7 @@ class ProjectGenerator {
     required String projectName,
     required String stateManagement,
     required String router,
+    String preset = 'default',
   }) async {
     _logger.info('Scaffolding project ${lightCyan.wrap(projectName)}...');
 
@@ -73,7 +74,20 @@ class ProjectGenerator {
       resolver.addNode(entry.key, entry.value.dependencies);
     }
 
-    final initialModules = ['routing'];
+    final List<String> initialModules;
+    switch (preset.toLowerCase()) {
+      case 'fintech':
+        initialModules = ['routing', 'networking', 'storage'];
+        break;
+      case 'ecommerce':
+        initialModules = ['routing', 'networking', 'storage', 'analytics'];
+        break;
+      case 'default':
+      default:
+        initialModules = ['routing'];
+        break;
+    }
+
     final List<String> installOrder;
     try {
       installOrder = resolver.resolve(initialModules, []);
@@ -93,6 +107,7 @@ class ProjectGenerator {
 name: $projectName
 state_management: $stateManagement
 router: $router
+preset: $preset
 modules:
 $modulesBlock
 ''');

@@ -32,6 +32,14 @@ class CreateCommand extends Command<int> {
       allowed: ['go_router', 'auto_route'],
       defaultsTo: 'go_router',
     );
+
+    argParser.addOption(
+      'preset',
+      abbr: 'p',
+      help: 'The preset architecture template to scaffold',
+      allowed: ['default', 'fintech', 'ecommerce'],
+      defaultsTo: 'default',
+    );
   }
 
   @override
@@ -56,6 +64,7 @@ class CreateCommand extends Command<int> {
 
     final String finalState;
     final String finalRouter;
+    final String finalPreset;
     final String finalName;
 
     if (fileConfig != null) {
@@ -63,6 +72,7 @@ class CreateCommand extends Command<int> {
       finalName = fileConfig.projectName;
       finalState = fileConfig.stateManagement;
       finalRouter = fileConfig.router;
+      finalPreset = fileConfig.preset;
     } else {
       _logger.info(
         'No configuration file found. Using command line arguments.',
@@ -70,12 +80,14 @@ class CreateCommand extends Command<int> {
       finalName = projectName;
       finalState = argResults?['state'] as String;
       finalRouter = argResults?['router'] as String;
+      finalPreset = argResults?['preset'] as String;
     }
 
     return await _projectGenerator.generate(
       projectName: finalName,
       stateManagement: finalState,
       router: finalRouter,
+      preset: finalPreset,
     );
   }
 }
