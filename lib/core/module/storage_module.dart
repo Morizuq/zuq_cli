@@ -6,14 +6,14 @@ import 'package:zuq_cli/core/module/base/project_context.dart';
 import 'package:path/path.dart' as p;
 import 'package:zuq_cli/core/utils/templates_locator.dart';
 
-class NetworkingModule implements Module {
+class StorageModule implements Module {
   @override
-  String get id => 'networking';
+  String get id => 'storage';
 
   @override
   Future<void> install(ProjectContext context) async {
-    // - Request required packages
-    context.corePackages.addAll(['dio', 'flutter_secure_storage', 'logger']);
+    // Add shared_preferences
+    context.corePackages.add('shared_preferences');
 
     final isRiverpod = context.stateManagement == 'riverpod';
 
@@ -21,7 +21,7 @@ class NetworkingModule implements Module {
     final brickPath = p.join(
       templatesPath,
       'modules',
-      'networking',
+      'storage',
     );
     final brick = Brick.path(brickPath);
     final generator = await MasonGenerator.fromBrick(brick);

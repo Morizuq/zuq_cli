@@ -6,28 +6,23 @@ import 'package:zuq_cli/core/module/base/project_context.dart';
 import 'package:path/path.dart' as p;
 import 'package:zuq_cli/core/utils/templates_locator.dart';
 
-class NetworkingModule implements Module {
+class AnalyticsModule implements Module {
   @override
-  String get id => 'networking';
+  String get id => 'analytics';
 
   @override
   Future<void> install(ProjectContext context) async {
-    // - Request required packages
-    context.corePackages.addAll(['dio', 'flutter_secure_storage', 'logger']);
-
-    final isRiverpod = context.stateManagement == 'riverpod';
-
     final templatesPath = TemplatesLocator.getTemplatesPath();
     final brickPath = p.join(
       templatesPath,
       'modules',
-      'networking',
+      'analytics',
     );
     final brick = Brick.path(brickPath);
     final generator = await MasonGenerator.fromBrick(brick);
 
     final variables = <String, dynamic>{
-      'isRiverpod': isRiverpod,
+      'isRiverpod': context.stateManagement == 'riverpod',
     };
 
     final target = DirectoryGeneratorTarget(Directory(context.libPath));

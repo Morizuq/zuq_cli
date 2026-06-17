@@ -1,0 +1,7 @@
+name: storage_brick
+description: Generates local storage service configurations using SharedPreferences.
+version: 0.1.0+1
+vars:
+  isRiverpod:
+    type: boolean
+    default: false

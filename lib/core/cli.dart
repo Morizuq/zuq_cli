@@ -1,5 +1,6 @@
 import 'package:args/command_runner.dart';
 import 'package:zuq_cli/commands/create_command.dart';
+import 'package:zuq_cli/commands/add_command.dart';
 
 class ZuqCli {
   final CommandRunner<int> runner;
@@ -10,6 +11,7 @@ class ZuqCli {
         'A custom developer CLI for streamling flutter workflows.',
       ) {
     runner.addCommand(CreateCommand());
+    runner.addCommand(AddCommand());
   }
 
   // Entry point to execute commands

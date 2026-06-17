@@ -1,0 +1,7 @@
+name: analytics_brick
+description: Generates analytics tracking contracts, interfaces, and development console logging implementation.
+version: 0.1.0+1
+vars:
+  isRiverpod:
+    type: boolean
+    default: false

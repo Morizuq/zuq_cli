@@ -1,0 +1,16 @@
+name: theme_brick
+description: Generates custom app colors, ThemeData, and dynamic theme switching state notifier wrapper.
+version: 0.1.0+1
+vars:
+  isRiverpod:
+    type: boolean
+    default: false
+  isBloc:
+    type: boolean
+    default: false
+  isProvider:
+    type: boolean
+    default: false
+  isNone:
+    type: boolean
+    default: false

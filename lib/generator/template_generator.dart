@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as p;
+import 'package:zuq_cli/core/utils/templates_locator.dart';
 
 class TemplateGenerator {
   const TemplateGenerator();
@@ -9,8 +10,9 @@ class TemplateGenerator {
     required String targetDirectory,
     required String featureName,
   }) async {
-    // Locate the local brick path
-    final brickPath = p.join(Directory.current.path, 'templates', 'feature');
+    // Locate the local brick path using TemplatesLocator
+    final templatesPath = TemplatesLocator.getTemplatesPath();
+    final brickPath = p.join(templatesPath, 'feature');
     final brick = Brick.path(brickPath);
 
     // Initialize the Mason generator from the brick
@@ -39,11 +41,9 @@ class TemplateGenerator {
     required bool isGoRouter,
     required bool isAutoRoute,
   }) async {
-    final brikPath = p.join(
-      Directory.current.path,
-      'templates',
-      'project_scaffold',
-    );
+    // Locate the local brick path using TemplatesLocator
+    final templatesPath = TemplatesLocator.getTemplatesPath();
+    final brikPath = p.join(templatesPath, 'project_scaffold');
     final brick = Brick.path(brikPath);
     final generator = await MasonGenerator.fromBrick(brick);
     final variables = <String, dynamic>{

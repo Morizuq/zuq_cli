@@ -4,6 +4,7 @@ import 'package:mason/mason.dart';
 import 'package:zuq_cli/core/module/base/module.dart';
 import 'package:zuq_cli/core/module/base/project_context.dart';
 import 'package:path/path.dart' as p;
+import 'package:zuq_cli/core/utils/templates_locator.dart';
 
 class RoutingModule implements Module {
   @override
@@ -21,9 +22,9 @@ class RoutingModule implements Module {
       context.devPackages.addAll(['auto_route_generator', 'build_runner']);
     }
 
+    final templatesPath = TemplatesLocator.getTemplatesPath();
     final brickPath = p.join(
-      Directory.current.path,
-      'templates',
+      templatesPath,
       'modules',
       'routing',
     );

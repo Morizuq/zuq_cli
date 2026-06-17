@@ -1,0 +1,4 @@
+name: l10n_brick
+description: Generates standard Flutter localization setup (l10n.yaml, .arb files, and BuildContext helper extension).
+version: 0.1.0+1
+vars:
