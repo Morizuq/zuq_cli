@@ -21,7 +21,6 @@ Zuq is a Dart CLI that scaffolds, extends, and audits Clean Architecture Flutter
 ## Installation
 
 ```bash
-# Once published
 dart pub global activate zuq_cli
 
 # From local source
