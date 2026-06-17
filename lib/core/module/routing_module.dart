@@ -11,6 +11,9 @@ class RoutingModule implements Module {
   String get id => 'routing';
 
   @override
+  List<String> get dependencies => [];
+
+  @override
   Future<void> install(ProjectContext context) async {
     final isGoRouter = context.router == 'go_router';
     final isAutoRoute = context.router == 'auto_route';

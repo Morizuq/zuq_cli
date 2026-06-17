@@ -11,6 +11,9 @@ class L10nModule implements Module {
   String get id => 'l10n';
 
   @override
+  List<String> get dependencies => [];
+
+  @override
   Future<void> install(ProjectContext context) async {
     // Add flutter_localizations from flutter SDK
     await Process.run(

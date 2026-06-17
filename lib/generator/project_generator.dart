@@ -5,9 +5,14 @@ import 'package:zuq_cli/core/module/base/module.dart';
 import 'package:zuq_cli/core/module/base/project_context.dart';
 import 'package:zuq_cli/core/module/networking_module.dart';
 import 'package:zuq_cli/core/module/routing_module.dart';
+import 'package:zuq_cli/core/module/storage_module.dart';
+import 'package:zuq_cli/core/module/theme_module.dart';
+import 'package:zuq_cli/core/module/l10n_module.dart';
+import 'package:zuq_cli/core/module/analytics_module.dart';
 import 'package:zuq_cli/core/process_runner.dart';
 import 'package:zuq_cli/generator/directory_generator.dart';
 import 'package:zuq_cli/generator/template_generator.dart';
+import 'package:zuq_cli/core/utils/dependency_resolver.dart';
 
 import 'package:path/path.dart' as p;
 
@@ -53,14 +58,43 @@ class ProjectGenerator {
     final projectPath = p.join(Directory.current.path, projectName);
     final libPath = p.join(projectPath, 'lib');
 
+    // Build the dependency graph using DependencyResolver
+    final resolver = DependencyResolver();
+    final Map<String, Module> allModules = {
+      'networking': NetworkingModule(),
+      'routing': RoutingModule(),
+      'storage': StorageModule(),
+      'theme': ThemeModule(),
+      'l10n': L10nModule(),
+      'analytics': AnalyticsModule(),
+    };
+
+    for (final entry in allModules.entries) {
+      resolver.addNode(entry.key, entry.value.dependencies);
+    }
+
+    final initialModules = ['routing'];
+    final List<String> installOrder;
+    try {
+      installOrder = resolver.resolve(initialModules, []);
+    } on CircularDependencyException catch (e) {
+      _logger.err('Dependency resolution error: $e');
+      return 1;
+    }
+
+    _logger.info('Resolved default modules installation order: ${installOrder.join(' -> ')}');
+
     // - Create a local zuq.yaml inside the new project for future commands
     final configProgress = _logger.progress('Creating project config file');
 
     final projectConfigFile = File(p.join(projectPath, 'zuq.yaml'));
+    final modulesBlock = installOrder.map((m) => '  - $m').join('\n');
     projectConfigFile.writeAsStringSync('''
 name: $projectName
 state_management: $stateManagement
 router: $router
+modules:
+$modulesBlock
 ''');
 
     configProgress.complete('zuq.yaml created inside the project.');
@@ -115,9 +149,9 @@ router: $router
       context.corePackages.add('provider');
     }
 
-    final modules = <Module>[RoutingModule(), NetworkingModule()];
-
-    for (final module in modules) {
+    // Process resolved modules in topological order
+    for (final modId in installOrder) {
+      final module = allModules[modId]!;
       final moduleProgress = _logger.progress(
         'Processing ${module.id} module...',
       );

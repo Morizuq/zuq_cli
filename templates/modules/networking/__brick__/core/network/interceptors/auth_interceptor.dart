@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../storage/secure_storage_service.dart';
 import '../network_constants.dart';
 
 /// Central authentication interceptor using a [QueuedInterceptor].
 ///
 /// Attaches Bearer token to requests and manages queued token refresh on 401.
 class AuthInterceptor extends QueuedInterceptor {
-  final FlutterSecureStorage secureStorage;
+  final SecureStorageService secureStorage;
   final Dio _refreshDio;
 
   AuthInterceptor(this.secureStorage)
@@ -24,7 +24,7 @@ class AuthInterceptor extends QueuedInterceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final token = await secureStorage.read(key: 'auth_token');
+    final token = await secureStorage.read('auth_token');
 
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -49,7 +49,7 @@ class AuthInterceptor extends QueuedInterceptor {
 
     // If request fails with 401 on non-public endpoints, trigger token refresh
     if (err.response?.statusCode == 401 && !isPublicAuth) {
-      final currentToken = await secureStorage.read(key: 'auth_token');
+      final currentToken = await secureStorage.read('auth_token');
       final requestToken = err.requestOptions.headers['Authorization']
           ?.toString()
           .replaceAll('Bearer ', '');
@@ -65,7 +65,7 @@ class AuthInterceptor extends QueuedInterceptor {
         }
       }
 
-      final refreshToken = await secureStorage.read(key: 'refresh_token');
+      final refreshToken = await secureStorage.read('refresh_token');
 
       if (refreshToken != null) {
         try {
@@ -81,11 +81,8 @@ class AuthInterceptor extends QueuedInterceptor {
             final newAccessToken = data['access_token'] as String;
             final newRefreshToken = data['refresh_token'] as String;
 
-            await secureStorage.write(key: 'auth_token', value: newAccessToken);
-            await secureStorage.write(
-              key: 'refresh_token',
-              value: newRefreshToken,
-            );
+            await secureStorage.write('auth_token', newAccessToken);
+            await secureStorage.write('refresh_token', newRefreshToken);
 
             try {
               final retryResponse = await _retry(

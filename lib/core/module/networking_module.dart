@@ -11,6 +11,9 @@ class NetworkingModule implements Module {
   String get id => 'networking';
 
   @override
+  List<String> get dependencies => ['storage', 'analytics'];
+
+  @override
   Future<void> install(ProjectContext context) async {
     // - Request required packages
     context.corePackages.addAll(['dio', 'flutter_secure_storage', 'logger']);

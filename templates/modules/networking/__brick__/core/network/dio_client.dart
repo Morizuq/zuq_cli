@@ -1,17 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../storage/secure_storage_service.dart';
 import 'network_constants.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 {{#isRiverpod}}
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
-});
-
 final dioProvider = Provider<Dio>((ref) {
-  final secureStorage = ref.watch(secureStorageProvider);
+  final secureStorage = ref.watch(secureStorageServiceProvider);
   final dio = Dio(
     BaseOptions(
       baseUrl: NetworkConstants.baseUrl,
@@ -30,15 +26,14 @@ final dioProvider = Provider<Dio>((ref) {
 {{^isRiverpod}}
 class NetworkService {
   final Dio dio;
-  final FlutterSecureStorage secureStorage;
+  final SecureStorageService secureStorage;
 
   const NetworkService({
     required this.dio,
     required this.secureStorage,
   });
 
-  factory NetworkService.create() {
-    final secureStorage = const FlutterSecureStorage();
+  factory NetworkService.create(SecureStorageService secureStorage) {
     final dio = Dio(
       BaseOptions(
         baseUrl: NetworkConstants.baseUrl,

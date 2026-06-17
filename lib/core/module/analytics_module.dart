@@ -11,6 +11,9 @@ class AnalyticsModule implements Module {
   String get id => 'analytics';
 
   @override
+  List<String> get dependencies => [];
+
+  @override
   Future<void> install(ProjectContext context) async {
     final templatesPath = TemplatesLocator.getTemplatesPath();
     final brickPath = p.join(

@@ -11,9 +11,12 @@ class StorageModule implements Module {
   String get id => 'storage';
 
   @override
+  List<String> get dependencies => [];
+
+  @override
   Future<void> install(ProjectContext context) async {
-    // Add shared_preferences
-    context.corePackages.add('shared_preferences');
+    // Add shared_preferences and flutter_secure_storage
+    context.corePackages.addAll(['shared_preferences', 'flutter_secure_storage']);
 
     final isRiverpod = context.stateManagement == 'riverpod';
 
