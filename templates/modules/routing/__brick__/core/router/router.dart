@@ -1,5 +1,5 @@
 {{#isGoRouter}}
-import 'package:{{name.snakeCase()}}/presentation/home_screen.dart';
+import 'package:{{name.snakeCase()}}/main.dart';
 import 'package:go_router/go_router.dart';
 import 'routes.dart';
 
