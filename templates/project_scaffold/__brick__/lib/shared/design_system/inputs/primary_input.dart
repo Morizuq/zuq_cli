@@ -37,12 +37,12 @@ class PrimaryInput extends StatelessWidget {
         if (labelText != null) ...[
           Text(
             labelText!,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+            style: theme.textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          AppSpacing.vXS,
+          AppSpacing.vXXS,
         ],
         TextFormField(
           controller: controller,

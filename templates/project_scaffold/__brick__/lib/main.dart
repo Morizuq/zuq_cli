@@ -7,14 +7,14 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_mode_notifier.dart';
 {{#isAutoRoute}}import 'package:auto_route/auto_route.dart';{{/isAutoRoute}}
 
-
-import 'package:{{name.snakeCase()}}/core/theme/theme_mode_notifier.dart';
 import 'package:{{name.snakeCase()}}/shared/design_system/tokens/app_border_radius.dart';
-import 'package:{{name.snakeCase()}}/shared/design_system/tokens/app_responsive.dart';
 import 'package:{{name.snakeCase()}}/shared/design_system/tokens/app_spacing.dart';
-import 'package:{{name.snakeCase()}}/shared/design_system/buttons/primary_button.dart';
-import 'package:{{name.snakeCase()}}/shared/design_system/inputs/primary_input.dart';
-import 'package:{{name.snakeCase()}}/shared/design_system/buttons/text_button.dart';
+import 'package:{{name.snakeCase()}}/shared/design_system/tokens/app_font_weight.dart';
+import 'package:{{name.snakeCase()}}/shared/design_system/tokens/app_line_height.dart';
+import 'package:{{name.snakeCase()}}/shared/design_system/tokens/app_letter_spacing.dart';
+import 'package:{{name.snakeCase()}}/shared/design_system/tokens/app_border_width.dart';
+import 'package:{{name.snakeCase()}}/shared/design_system/tokens/app_icon_size.dart';
+import 'package:{{name.snakeCase()}}/shared/design_system/tokens/brand_colors.dart';
 
 void main() {
   runApp(
@@ -118,20 +118,14 @@ class HomeScreen extends {{#isRiverpod}}ConsumerStatefulWidget{{/isRiverpod}}{{^
 }
 
 class _HomeScreenState extends {{#isRiverpod}}ConsumerState<HomeScreen>{{/isRiverpod}}{{^isRiverpod}}State<HomeScreen>{{/isRiverpod}} {
-  final _formKey = GlobalKey<FormState>();
-  bool _isBtnLoading = false;
-
   void _handleToggleTheme() {
     {{#isRiverpod}}
     ref.read(themeModeProvider.notifier).toggleTheme();
-    {{/isRiverpod}}
-    {{#isBloc}}
+    {{/isRiverpod}}{{#isBloc}}
     context.read<ThemeCubit>().toggleTheme();
-    {{/isBloc}}
-    {{#isProvider}}
+    {{/isBloc}}{{#isProvider}}
     Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
-    {{/isProvider}}
-    {{#isNone}}
+    {{/isProvider}}{{#isNone}}
     themeNotifier.toggleTheme();
     {{/isNone}}
   }
@@ -140,210 +134,122 @@ class _HomeScreenState extends {{#isRiverpod}}ConsumerState<HomeScreen>{{/isRive
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final brandColors = context.brandColors;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Zuq Design System'),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
-            onPressed: _handleToggleTheme,
-            tooltip: 'Toggle Theme Mode',
-          ),
-        ],
-      ),
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.m),
-          child: Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Card with beautiful Gradient
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(AppSpacing.l),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.l),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Centered dynamic Logo Mark
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: brandColors.dark,
+                    borderRadius: AppBorderRadius.allXL,
+                    boxShadow: [
+                      BoxShadow(
+                        color: brandColors.mid.withValues(alpha: 0.15),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '⚡',
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                      fontSize: 38,
+                      color: isDark ? brandColors.subtle : Colors.white,
+                    ),
+                  ),
+                ),
+                AppSpacing.vL,
+
+                // App Name
+                Text(
+                  '{{name}}',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: AppFontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                AppSpacing.vXS,
+
+                // Subtitle
+                Text(
+                  'Clean Architecture Boilerplate',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    height: AppLineHeight.body,
+                  ),
+                ),
+                AppSpacing.vL,
+
+                // Custom Premium Theme Toggle Button
+                GestureDetector(
+                  onTap: _handleToggleTheme,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.m,
+                      vertical: AppSpacing.s,
+                    ),
                     decoration: BoxDecoration(
-                      borderRadius: AppBorderRadius.allL,
-                      gradient: LinearGradient(
-                        colors: [
-                          theme.colorScheme.primary,
-                          theme.colorScheme.secondary,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                      color: theme.colorScheme.surfaceContainerLow,
+                      borderRadius: AppBorderRadius.pill,
+                      border: Border.all(
+                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                        width: AppBorderWidth.hairline,
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'Welcome to {{name.titleCase()}}',
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            color: theme.colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Icon(
+                          isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                          size: AppIconSize.s,
+                          color: brandColors.mid,
                         ),
-                        AppSpacing.vXS,
+                        AppSpacing.hS,
                         Text(
-                          'This is your premium responsive design system showcase.',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                          isDark ? 'LIGHT MODE' : 'DARK MODE',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: AppFontWeight.medium,
+                            color: theme.colorScheme.onSurface,
+                            letterSpacing: AppLetterSpacing.label,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  AppSpacing.vL,
+                ),
+                AppSpacing.vXL,
 
-                  // Section Title
-                  Text(
-                    'Responsive Layouts',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
+                // Tech stack info pill
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.m,
+                    vertical: AppSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: brandColors.subtle,
+                    borderRadius: AppBorderRadius.pill,
+                  ),
+                  child: Text(
+                    'State: {{stateName}}  •  Router: {{routerName}}',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: brandColors.mid,
+                      fontWeight: AppFontWeight.medium,
+                      letterSpacing: AppLetterSpacing.label,
                     ),
                   ),
-                  AppSpacing.vS,
-
-                  // Responsive columns
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final columnsCount = context.responsive<int>(
-                        mobile: 1,
-                        tablet: 2,
-                        desktop: 3,
-                      );
-
-                      final titles = [
-                        'Adaptive Grid',
-                        'Responsive Spacing',
-                        'Fluid Typography',
-                      ];
-                      final descriptions = [
-                        'Columns dynamically scale between Mobile (1), Tablet (2), and Desktop (3).',
-                        'AppSpacing tokens automatically adapt to standard screen layouts.',
-                        'Font sizes and margins adjust gracefully across varying window ratios.',
-                      ];
-
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: columnsCount,
-                          crossAxisSpacing: AppSpacing.m,
-                          mainAxisSpacing: AppSpacing.m,
-                          childAspectRatio: 2.2,
-                        ),
-                        itemCount: 3,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surface,
-                              borderRadius: AppBorderRadius.allM,
-                              border: Border.all(
-                                color: theme.colorScheme.outline.withValues(alpha: 0.1),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.m),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    titles[index],
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  AppSpacing.vXXS,
-                                  Expanded(
-                                    child: Text(
-                                      descriptions[index],
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                                      ),
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                  AppSpacing.vL,
-
-                  // Section Title: Forms & Inputs
-                  Text(
-                    'Form Inputs & Controls',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  AppSpacing.vS,
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const PrimaryInput(
-                          labelText: 'Email Address',
-                          hintText: 'enter your email address',
-                          prefixIcon: Icon(Icons.email_outlined),
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        AppSpacing.vM,
-                        const PrimaryInput(
-                          labelText: 'Password',
-                          hintText: '••••••••',
-                          obscureText: true,
-                          prefixIcon: Icon(Icons.lock_outline),
-                        ),
-                        AppSpacing.vL,
-                        Row(
-                          children: [
-                            PrimaryButton(
-                              text: 'Submit Action',
-                              isLoading: _isBtnLoading,
-                              icon: Icons.check_circle_outline,
-                              onPressed: () async {
-                                setState(() {
-                                  _isBtnLoading = true;
-                                });
-                                await Future.delayed(const Duration(seconds: 2));
-                                if (context.mounted) {
-                                  setState(() {
-                                    _isBtnLoading = false;
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Form submitted successfully!'),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                            AppSpacing.hS,
-                            AppTextButton(
-                              text: 'Forgot Password?',
-                              onPressed: () {},
-                              icon: Icons.help_outline,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
