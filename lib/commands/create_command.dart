@@ -86,12 +86,53 @@ class CreateCommand extends Command<int> {
         'No configuration file found. Using command line arguments.',
       );
       finalName = projectName;
-      finalState = argResults?['state'] as String;
-      finalRouter = argResults?['router'] as String;
-      finalPreset = argResults?['preset'] as String;
+
+      final results = argResults;
+      if (results != null) {
+        if (results.wasParsed('state')) {
+          finalState = results['state'] as String;
+        } else if (stdin.hasTerminal) {
+          finalState = _logger.chooseOne(
+            'Select state management solution:',
+            choices: ['riverpod', 'bloc', 'provider', 'none'],
+            defaultValue: 'none',
+          );
+        } else {
+          finalState = results['state'] as String;
+        }
+
+        if (results.wasParsed('router')) {
+          finalRouter = results['router'] as String;
+        } else if (stdin.hasTerminal) {
+          finalRouter = _logger.chooseOne(
+            'Select routing solution:',
+            choices: ['go_router', 'auto_route'],
+            defaultValue: 'go_router',
+          );
+        } else {
+          finalRouter = results['router'] as String;
+        }
+
+        if (results.wasParsed('preset')) {
+          finalPreset = results['preset'] as String;
+        } else if (stdin.hasTerminal) {
+          finalPreset = _logger.chooseOne(
+            'Select preset architecture template:',
+            choices: ['default', 'fintech', 'ecommerce'],
+            defaultValue: 'default',
+          );
+        } else {
+          finalPreset = results['preset'] as String;
+        }
+      } else {
+        finalState = 'none';
+        finalRouter = 'go_router';
+        finalPreset = 'default';
+      }
     }
 
-    List<String> finalPlatforms = argResults?['platforms'] as List<String>? ?? [];
+    List<String> finalPlatforms =
+        argResults?['platforms'] as List<String>? ?? [];
     if (finalPlatforms.isEmpty) {
       if (stdin.hasTerminal) {
         finalPlatforms = _logger.chooseAny(

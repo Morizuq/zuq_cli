@@ -1,3 +1,9 @@
+## 1.0.4
+
+- Split feature domain model into a pure domain entity and a serialization-aware model in the data layer.
+- Added abstract repository interface to domain, repository implementation to data, and usecase execution to domain for clean architecture layout.
+- Added interactive prompts for option flags (`--state`, `--router`, and `--preset`) during project creation if they are not supplied.
+
 ## 1.0.3
 
 - Moved the template `HomeScreen` from `lib/presentation/home_screen.dart` directly into `main.dart` with a warning comment.
