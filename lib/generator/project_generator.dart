@@ -112,6 +112,7 @@ name: $projectName
 state_management: $stateManagement
 router: $router
 preset: $preset
+features_path: lib/features
 modules:
 $modulesBlock
 ''');

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-{{#isRiverpod}}import 'package:flutter_riverpod/flutter_riverpod.dart';{{/isRiverpod}}
-{{#isBloc}}import 'package:flutter_bloc/flutter_bloc.dart';{{/isBloc}}
-{{#isProvider}}import 'package:provider/provider.dart';{{/isProvider}}
-import 'core/router/router.dart';
+{{#isRiverpod}}import 'package:flutter_riverpod/flutter_riverpod.dart';{{/isRiverpod}}{{#isBloc}}import 'package:flutter_bloc/flutter_bloc.dart';{{/isBloc}}{{#isProvider}}import 'package:provider/provider.dart';{{/isProvider}}{{#isGoRouter}}import 'core/router/router.dart';{{/isGoRouter}}{{#isAutoRoute}}import 'core/router/router.dart';{{/isAutoRoute}}
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_mode_notifier.dart';
 {{#isAutoRoute}}import 'package:auto_route/auto_route.dart';{{/isAutoRoute}}
@@ -36,66 +33,130 @@ class MyApp extends StatelessWidget {
     return Consumer(
       builder: (context, ref, child) {
         final themeMode = ref.watch(themeModeProvider);
-        {{#isAutoRoute}}
-        final appRouter = AppRouter();
-        {{/isAutoRoute}}
+        {{#isGoRouter}}
         return MaterialApp.router(
           title: '{{name.titleCase()}}',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,
-          {{#isGoRouter}}routerConfig: router,{{/isGoRouter}}
-          {{#isAutoRoute}}routerConfig: appRouter.config(),{{/isAutoRoute}}
+          routerConfig: router,
         );
+        {{/isGoRouter}}{{#isAutoRoute}}
+        final appRouter = AppRouter();
+        return MaterialApp.router(
+          title: '{{name.titleCase()}}',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          routerConfig: appRouter.config(),
+        );
+        {{/isAutoRoute}}
+        {{^isGoRouter}}
+        {{^isAutoRoute}}
+        return MaterialApp(
+          title: '{{name.titleCase()}}',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          home: const HomeScreen(),
+        );
+        {{/isAutoRoute}}
+        {{/isGoRouter}}
       },
     );
     {{/isRiverpod}}{{#isBloc}}
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
-        {{#isAutoRoute}}
-        final appRouter = AppRouter();
-        {{/isAutoRoute}}
+        {{#isGoRouter}}
         return MaterialApp.router(
           title: '{{name.titleCase()}}',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,
-          {{#isGoRouter}}routerConfig: router,{{/isGoRouter}}
-          {{#isAutoRoute}}routerConfig: appRouter.config(),{{/isAutoRoute}}
+          routerConfig: router,
         );
+        {{/isGoRouter}}{{#isAutoRoute}}
+        final appRouter = AppRouter();
+        return MaterialApp.router(
+          title: '{{name.titleCase()}}',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          routerConfig: appRouter.config(),
+        );
+        {{/isAutoRoute}}{{^isGoRouter}}{{^isAutoRoute}}
+        return MaterialApp(
+          title: '{{name.titleCase()}}',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          home: const HomeScreen(),
+        );
+        {{/isAutoRoute}}{{/isGoRouter}}
       },
     );
     {{/isBloc}}{{#isProvider}}
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
-        {{#isAutoRoute}}
-        final appRouter = AppRouter();
-        {{/isAutoRoute}}
+        {{#isGoRouter}}
         return MaterialApp.router(
           title: '{{name.titleCase()}}',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.themeMode,
-          {{#isGoRouter}}routerConfig: router,{{/isGoRouter}}
-          {{#isAutoRoute}}routerConfig: appRouter.config(),{{/isAutoRoute}}
+          routerConfig: router,
         );
+        {{/isGoRouter}}
+        {{#isAutoRoute}}
+        final appRouter = AppRouter();
+        return MaterialApp.router(
+          title: '{{name.titleCase()}}',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeProvider.themeMode,
+          routerConfig: appRouter.config(),
+        );
+        {{/isAutoRoute}}{{^isGoRouter}}{{^isAutoRoute}}
+        return MaterialApp(
+          title: '{{name.titleCase()}}',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeProvider.themeMode,
+          home: const HomeScreen(),
+        );
+        {{/isAutoRoute}}{{/isGoRouter}}
       },
     );
     {{/isProvider}}{{#isNone}}
     return ListenableBuilder(
       listenable: themeNotifier,
       builder: (context, child) {
-        {{#isAutoRoute}}
-        final appRouter = AppRouter();
-        {{/isAutoRoute}}
+        {{#isGoRouter}}
         return MaterialApp.router(
           title: '{{name.titleCase()}}',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeNotifier.themeMode,
-          {{#isGoRouter}}routerConfig: router,{{/isGoRouter}}
-          {{#isAutoRoute}}routerConfig: appRouter.config(),{{/isAutoRoute}}
+          routerConfig: router,
         );
+        {{/isGoRouter}}{{#isAutoRoute}}
+        final appRouter = AppRouter();
+        return MaterialApp.router(
+          title: '{{name.titleCase()}}',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeNotifier.themeMode,
+          routerConfig: appRouter.config(),
+        );
+        {{/isAutoRoute}}{{^isGoRouter}}{{^isAutoRoute}}
+        return MaterialApp(
+          title: '{{name.titleCase()}}',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeNotifier.themeMode,
+          home: const HomeScreen(),
+        );
+        {{/isAutoRoute}}{{/isGoRouter}}
       },
     );
     {{/isNone}}
@@ -118,8 +179,7 @@ class HomeScreen extends {{#isRiverpod}}ConsumerStatefulWidget{{/isRiverpod}}{{^
 }
 
 class _HomeScreenState extends {{#isRiverpod}}ConsumerState<HomeScreen>{{/isRiverpod}}{{^isRiverpod}}State<HomeScreen>{{/isRiverpod}} {
-  void _handleToggleTheme() {
-    {{#isRiverpod}}
+  void _handleToggleTheme() { {{#isRiverpod}}
     ref.read(themeModeProvider.notifier).toggleTheme();
     {{/isRiverpod}}{{#isBloc}}
     context.read<ThemeCubit>().toggleTheme();

@@ -1,6 +1,6 @@
 name: zuq_cli
 description: A command-line interface to scaffold, extend, and audit Flutter Clean Architecture projects.
-version: 1.0.4
+version: 1.0.5
 repository: https://github.com/Morizuq/zuq_cli
 
 environment:
@@ -15,6 +15,7 @@ dependencies:
   mason: ^0.1.2
   mason_logger: ^0.3.5
   path: ^1.9.0
+  pub_semver: ^2.1.4
   yaml: ^3.1.3
   yaml_edit: ^2.2.4
 

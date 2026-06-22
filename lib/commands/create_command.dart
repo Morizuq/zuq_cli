@@ -31,7 +31,7 @@ class CreateCommand extends Command<int> {
       'router',
       abbr: 'r',
       help: 'The routing solution to use',
-      allowed: ['go_router', 'auto_route'],
+      allowed: ['go_router', 'auto_route', 'none'],
       defaultsTo: 'go_router',
     );
 
@@ -106,7 +106,7 @@ class CreateCommand extends Command<int> {
         } else if (stdin.hasTerminal) {
           finalRouter = _logger.chooseOne(
             'Select routing solution:',
-            choices: ['go_router', 'auto_route'],
+            choices: ['go_router', 'auto_route', 'none'],
             defaultValue: 'go_router',
           );
         } else {
