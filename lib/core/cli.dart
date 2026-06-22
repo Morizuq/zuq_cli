@@ -5,6 +5,7 @@ import 'package:zuq_cli/commands/add_command.dart';
 import 'package:zuq_cli/commands/doctor_command.dart';
 import 'package:zuq_cli/commands/upgrade_command.dart';
 import 'package:zuq_cli/commands/check_update_command.dart';
+import 'package:zuq_cli/commands/init_command.dart';
 import 'package:zuq_cli/core/utils/update_checker.dart';
 
 class ZuqCli {
@@ -12,16 +13,17 @@ class ZuqCli {
   final Logger _logger;
 
   ZuqCli({Logger? logger})
-      : _logger = logger ?? Logger(),
-        runner = CommandRunner<int>(
-          'zuq',
-          'A custom developer CLI for streamling flutter workflows.',
-        ) {
+    : _logger = logger ?? Logger(),
+      runner = CommandRunner<int>(
+        'zuq',
+        'A custom developer CLI for streamling flutter workflows.',
+      ) {
     runner.addCommand(CreateCommand(logger: _logger));
     runner.addCommand(AddCommand(logger: _logger));
     runner.addCommand(DoctorCommand(logger: _logger));
     runner.addCommand(UpgradeCommand(logger: _logger));
     runner.addCommand(CheckUpdateCommand());
+    runner.addCommand(InitCommand(logger: _logger));
   }
 
   // Entry point to execute commands
