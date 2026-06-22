@@ -75,8 +75,7 @@ class MyApp extends StatelessWidget {
           themeMode: themeMode,
           routerConfig: router,
         );
-        {{/isGoRouter}}
-        {{#isAutoRoute}}
+        {{/isGoRouter}}{{#isAutoRoute}}
         final appRouter = AppRouter();
         return MaterialApp.router(
           title: '{{name.titleCase()}}',
@@ -85,9 +84,7 @@ class MyApp extends StatelessWidget {
           themeMode: themeMode,
           routerConfig: appRouter.config(),
         );
-        {{/isAutoRoute}}
-        {{^isGoRouter}}
-        {{^isAutoRoute}}
+        {{/isAutoRoute}}{{^isGoRouter}}{{^isAutoRoute}}
         return MaterialApp(
           title: '{{name.titleCase()}}',
           theme: AppTheme.lightTheme,
@@ -95,8 +92,7 @@ class MyApp extends StatelessWidget {
           themeMode: themeMode,
           home: const HomeScreen(),
         );
-        {{/isAutoRoute}}
-        {{/isGoRouter}}
+        {{/isAutoRoute}}{{/isGoRouter}}
       },
     );
     {{/isBloc}}{{#isProvider}}
@@ -120,9 +116,7 @@ class MyApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           routerConfig: appRouter.config(),
         );
-        {{/isAutoRoute}}
-        {{^isGoRouter}}
-        {{^isAutoRoute}}
+        {{/isAutoRoute}}{{^isGoRouter}}{{^isAutoRoute}}
         return MaterialApp(
           title: '{{name.titleCase()}}',
           theme: AppTheme.lightTheme,
@@ -130,8 +124,7 @@ class MyApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           home: const HomeScreen(),
         );
-        {{/isAutoRoute}}
-        {{/isGoRouter}}
+        {{/isAutoRoute}}{{/isGoRouter}}
       },
     );
     {{/isProvider}}{{#isNone}}
@@ -146,8 +139,7 @@ class MyApp extends StatelessWidget {
           themeMode: themeNotifier.themeMode,
           routerConfig: router,
         );
-        {{/isGoRouter}}
-        {{#isAutoRoute}}
+        {{/isGoRouter}}{{#isAutoRoute}}
         final appRouter = AppRouter();
         return MaterialApp.router(
           title: '{{name.titleCase()}}',
@@ -156,9 +148,7 @@ class MyApp extends StatelessWidget {
           themeMode: themeNotifier.themeMode,
           routerConfig: appRouter.config(),
         );
-        {{/isAutoRoute}}
-        {{^isGoRouter}}
-        {{^isAutoRoute}}
+        {{/isAutoRoute}}{{^isGoRouter}}{{^isAutoRoute}}
         return MaterialApp(
           title: '{{name.titleCase()}}',
           theme: AppTheme.lightTheme,
@@ -166,8 +156,7 @@ class MyApp extends StatelessWidget {
           themeMode: themeNotifier.themeMode,
           home: const HomeScreen(),
         );
-        {{/isAutoRoute}}
-        {{/isGoRouter}}
+        {{/isAutoRoute}}{{/isGoRouter}}
       },
     );
     {{/isNone}}
@@ -190,8 +179,7 @@ class HomeScreen extends {{#isRiverpod}}ConsumerStatefulWidget{{/isRiverpod}}{{^
 }
 
 class _HomeScreenState extends {{#isRiverpod}}ConsumerState<HomeScreen>{{/isRiverpod}}{{^isRiverpod}}State<HomeScreen>{{/isRiverpod}} {
-  void _handleToggleTheme() {
-    {{#isRiverpod}}
+  void _handleToggleTheme() {{{#isRiverpod}}
     ref.read(themeModeProvider.notifier).toggleTheme();
     {{/isRiverpod}}{{#isBloc}}
     context.read<ThemeCubit>().toggleTheme();
