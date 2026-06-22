@@ -85,31 +85,71 @@ class InitCommand extends Command<int> {
     final zuqYamlFile = File('zuq.yaml');
     bool overwrite = argResults?['force'] as bool? ?? false;
 
-    if (zuqYamlFile.existsSync() && !overwrite) {
-      if (_hasTerminal) {
-        overwrite = _logger.confirm(
-          'A zuq.yaml file already exists in this directory. Do you want to overwrite it?',
-          defaultValue: false,
-        );
-        if (!overwrite) {
-          _logger.info('Initialization aborted.');
-          return 0;
+    List<String> existingModules = [];
+    String preset = 'default';
+    String featuresPath = 'lib/features';
+
+    if (zuqYamlFile.existsSync()) {
+      try {
+        final content = zuqYamlFile.readAsStringSync();
+        final doc = loadYaml(content);
+        if (doc is Map) {
+          final rawModules = doc['modules'];
+          if (rawModules is List) {
+            existingModules = rawModules
+                .where((m) => m != null)
+                .map((m) => m.toString())
+                .toList();
+          }
+          if (doc.containsKey('preset')) {
+            preset = doc['preset']?.toString() ?? 'default';
+          }
+          if (doc.containsKey('features_path')) {
+            featuresPath = doc['features_path']?.toString() ?? 'lib/features';
+          }
         }
-      } else {
-        _logger.err(
-          'Error: A zuq.yaml file already exists in this directory. Use --force to overwrite.',
-        );
-        return 1;
+      } catch (_) {}
+
+      if (!overwrite) {
+        if (_hasTerminal) {
+          overwrite = _logger.confirm(
+            'A zuq.yaml file already exists in this directory. Do you want to overwrite it?',
+            defaultValue: false,
+          );
+          if (!overwrite) {
+            _logger.info('Initialization aborted.');
+            return 0;
+          }
+        } else {
+          _logger.err(
+            'Error: A zuq.yaml file already exists in this directory. Use --force to overwrite.',
+          );
+          return 1;
+        }
       }
     }
+
+    if (featuresPath == 'lib/features' &&
+        !Directory('lib/features').existsSync()) {
+      if (Directory('lib/modules').existsSync()) {
+        featuresPath = 'lib/modules';
+      } else if (Directory('lib/src/features').existsSync()) {
+        featuresPath = 'lib/src/features';
+      }
+    }
+
+    final modulesBlock = existingModules.isEmpty
+        ? 'modules: []'
+        : 'modules:\n${existingModules.map((m) => '  - $m').join('\n')}';
 
     try {
       zuqYamlFile.writeAsStringSync('''
 name: $projectName
 state_management: $stateManagement
 router: $router
-preset: default
-modules: []
+preset: $preset
+features_path: $featuresPath
+$modulesBlock
 ''');
     } catch (e) {
       _logger.err('Failed to write zuq.yaml: $e');
@@ -123,8 +163,9 @@ modules: []
     _logger.info('  - Name: $projectName');
     _logger.info('  - State Management: $stateManagement');
     _logger.info('  - Router: $router');
+    _logger.info('  - Features Path: $featuresPath');
 
-    final featuresDir = Directory('lib/features');
+    final featuresDir = Directory(featuresPath);
     if (!featuresDir.existsSync()) {
       _logger.info('\nNext steps:');
       _logger.info(
@@ -132,7 +173,7 @@ modules: []
       );
     } else {
       _logger.info(
-        '\nFound existing lib/features directory. You can run `zuq doctor` to audit layer boundaries.',
+        '\nFound existing features directory at $featuresPath. You can run `zuq doctor` to audit layer boundaries.',
       );
     }
 

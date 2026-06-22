@@ -81,6 +81,7 @@ void main() {
         'state_management': 'riverpod',
         'router': 'go_router',
         'preset': 'fintech',
+        'features_path': 'lib/modules',
         'modules': ['networking', 'storage'],
       };
 
@@ -90,6 +91,7 @@ void main() {
       expect(config.stateManagement, equals('riverpod'));
       expect(config.router, equals('go_router'));
       expect(config.preset, equals('fintech'));
+      expect(config.featuresPath, equals('lib/modules'));
       expect(config.modules, equals(['networking', 'storage']));
     });
 
@@ -102,6 +104,7 @@ void main() {
       expect(config.stateManagement, equals('none'));
       expect(config.router, equals('go_router'));
       expect(config.preset, equals('default'));
+      expect(config.featuresPath, equals('lib/features'));
       expect(config.modules, isEmpty);
     });
   });

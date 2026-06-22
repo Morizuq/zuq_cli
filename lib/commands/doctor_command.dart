@@ -30,7 +30,8 @@ class DoctorCommand extends Command<int> {
   final String name = 'doctor';
 
   @override
-  final String description = 'Perform audits on the codebase, enforcing clean-architecture boundaries.';
+  final String description =
+      'Perform audits on the codebase, enforcing clean-architecture boundaries.';
 
   DoctorCommand({
     ConfigParser configParser = const ConfigParser(),
@@ -50,20 +51,24 @@ class DoctorCommand extends Command<int> {
     final projectName = projectConfig.projectName;
     final projectPath = Directory.current.path;
     final libPath = p.join(projectPath, 'lib');
-    final featuresPath = p.join(libPath, 'features');
+    final featuresPath = p.join(projectPath, projectConfig.featuresPath);
 
     if (!Directory(featuresPath).existsSync()) {
-      _logger.info('No features directory found under lib/features. Architecture is clean.');
+      _logger.info(
+        'No features directory found under ${projectConfig.featuresPath}. Architecture is clean.',
+      );
       return 0;
     }
 
-    _logger.info('Auditing project architectural boundaries for ${lightCyan.wrap(projectName)}...');
+    _logger.info(
+      'Auditing project architectural boundaries for ${lightCyan.wrap(projectName)}...',
+    );
 
     final List<DoctorViolation> violations = [];
     final dartFiles = _findDartFiles(Directory(featuresPath));
 
     for (final file in dartFiles) {
-      final sourceLayer = _getLayerOfPath(file.path, libPath);
+      final sourceLayer = _getLayerOfPath(file.path, featuresPath);
       if (sourceLayer == null) continue;
 
       final fileViolations = _auditFile(
@@ -71,6 +76,7 @@ class DoctorCommand extends Command<int> {
         sourceLayer: sourceLayer,
         projectName: projectName,
         libPath: libPath,
+        featuresPath: featuresPath,
       );
       violations.addAll(fileViolations);
     }
@@ -80,7 +86,9 @@ class DoctorCommand extends Command<int> {
       return 0;
     }
 
-    _logger.err('\n✗ Architecture audit failed: ${violations.length} violations found:\n');
+    _logger.err(
+      '\n✗ Architecture audit failed: ${violations.length} violations found:\n',
+    );
 
     for (final violation in violations) {
       final relativePath = p.relative(violation.filePath, from: projectPath);
@@ -108,11 +116,11 @@ class DoctorCommand extends Command<int> {
     return files;
   }
 
-  String? _getLayerOfPath(String filePath, String libPath) {
-    final relative = p.relative(filePath, from: libPath);
+  String? _getLayerOfPath(String filePath, String featuresPath) {
+    final relative = p.relative(filePath, from: featuresPath);
     final parts = p.split(relative);
-    if (parts.length >= 3 && parts[0] == 'features') {
-      final layer = parts[2];
+    if (parts.length >= 2) {
+      final layer = parts[1];
       if (layer == 'domain' || layer == 'data' || layer == 'presentation') {
         return layer;
       }
@@ -125,6 +133,7 @@ class DoctorCommand extends Command<int> {
     required String sourceLayer,
     required String projectName,
     required String libPath,
+    required String featuresPath,
   }) {
     final List<DoctorViolation> fileViolations = [];
     final lines = file.readAsLinesSync();
@@ -172,7 +181,7 @@ class DoctorCommand extends Command<int> {
 
         if (targetPath == null) continue;
 
-        final targetLayer = _getLayerOfPath(targetPath, libPath);
+        final targetLayer = _getLayerOfPath(targetPath, featuresPath);
         if (targetLayer == null) continue;
 
         final violationReason = _checkLayerViolation(sourceLayer, targetLayer);

@@ -41,8 +41,7 @@ class AddFeatureCommand extends Command<int> {
     }
 
     final projectPath = Directory.current.path;
-    final libPath = p.join(projectPath, 'lib');
-    final featuresPath = p.join(libPath, 'features');
+    final featuresPath = p.join(projectPath, projectConfig.featuresPath);
 
     final progress = _logger.progress('Scaffolding feature $featureName...');
 
@@ -70,7 +69,7 @@ class AddFeatureCommand extends Command<int> {
       return 1;
     }
 
-    _logger.success('Successfully added feature $featureName under lib/features!');
+    _logger.success('Successfully added feature $featureName under ${projectConfig.featuresPath}!');
     return 0;
   }
 }

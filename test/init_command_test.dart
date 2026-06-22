@@ -90,6 +90,7 @@ dependencies:
         expect(doc['state_management'], equals('bloc'));
         expect(doc['router'], equals('go_router'));
         expect(doc['preset'], equals('default'));
+        expect(doc['features_path'], equals('lib/features'));
         expect(doc['modules'], isEmpty);
       },
     );
@@ -167,6 +168,66 @@ dependencies:
             'Error: A zuq.yaml file already exists in this directory. Use --force to overwrite.',
           ),
         );
+      },
+    );
+
+    test('should auto-detect lib/modules and write to features_path', () async {
+      final pubspecFile = File('pubspec.yaml');
+      pubspecFile.writeAsStringSync('name: custom_layout\ndependencies:\n');
+
+      Directory('lib/modules').createSync(recursive: true);
+
+      final exitCode = await runner.run(['init']);
+      expect(exitCode, equals(0));
+
+      final zuqYamlFile = File('zuq.yaml');
+      final doc = loadYaml(zuqYamlFile.readAsStringSync()) as Map;
+      expect(doc['features_path'], equals('lib/modules'));
+    });
+
+    test(
+      'should auto-detect lib/src/features and write to features_path',
+      () async {
+        final pubspecFile = File('pubspec.yaml');
+        pubspecFile.writeAsStringSync('name: custom_layout\ndependencies:\n');
+
+        Directory('lib/src/features').createSync(recursive: true);
+
+        final exitCode = await runner.run(['init']);
+        expect(exitCode, equals(0));
+
+        final zuqYamlFile = File('zuq.yaml');
+        final doc = loadYaml(zuqYamlFile.readAsStringSync()) as Map;
+        expect(doc['features_path'], equals('lib/src/features'));
+      },
+    );
+
+    test(
+      'should preserve pre-existing preset, features_path, and modules when overwriting with force',
+      () async {
+        final pubspecFile = File('pubspec.yaml');
+        pubspecFile.writeAsStringSync('name: my_app\ndependencies:\n');
+
+        final zuqYamlFile = File('zuq.yaml');
+        zuqYamlFile.writeAsStringSync('''
+name: old_app
+state_management: none
+router: none
+preset: fintech
+features_path: lib/modules
+modules:
+  - routing
+  - storage
+''');
+
+        final exitCode = await runner.run(['init', '--force']);
+        expect(exitCode, equals(0));
+
+        final doc = loadYaml(zuqYamlFile.readAsStringSync()) as Map;
+        expect(doc['name'], equals('my_app'));
+        expect(doc['preset'], equals('fintech'));
+        expect(doc['features_path'], equals('lib/modules'));
+        expect(doc['modules'], equals(['routing', 'storage']));
       },
     );
   });

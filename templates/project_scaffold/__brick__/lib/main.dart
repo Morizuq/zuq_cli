@@ -179,7 +179,7 @@ class HomeScreen extends {{#isRiverpod}}ConsumerStatefulWidget{{/isRiverpod}}{{^
 }
 
 class _HomeScreenState extends {{#isRiverpod}}ConsumerState<HomeScreen>{{/isRiverpod}}{{^isRiverpod}}State<HomeScreen>{{/isRiverpod}} {
-  void _handleToggleTheme() {{{#isRiverpod}}
+  void _handleToggleTheme() { {{#isRiverpod}}
     ref.read(themeModeProvider.notifier).toggleTheme();
     {{/isRiverpod}}{{#isBloc}}
     context.read<ThemeCubit>().toggleTheme();

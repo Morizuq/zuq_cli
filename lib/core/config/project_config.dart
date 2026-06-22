@@ -3,6 +3,7 @@ class ProjectConfig {
   final String stateManagement;
   final String router;
   final String preset;
+  final String featuresPath;
   final List<String> modules;
 
   ProjectConfig({
@@ -10,6 +11,7 @@ class ProjectConfig {
     required this.stateManagement,
     required this.router,
     required this.preset,
+    required this.featuresPath,
     required this.modules,
   });
 
@@ -23,6 +25,7 @@ class ProjectConfig {
       stateManagement: map['state_management'] as String? ?? 'none',
       router: map['router'] as String? ?? 'go_router',
       preset: map['preset'] as String? ?? 'default',
+      featuresPath: map['features_path'] as String? ?? 'lib/features',
       modules: rawModules.cast<String>(),
     );
   }
