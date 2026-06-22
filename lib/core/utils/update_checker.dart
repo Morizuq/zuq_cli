@@ -42,7 +42,9 @@ class UpdateChecker {
       final file = getCacheFile();
       if (file.existsSync()) {
         final content = file.readAsStringSync();
-        return UpdateCache.fromJson(jsonDecode(content) as Map<String, dynamic>);
+        return UpdateCache.fromJson(
+          jsonDecode(content) as Map<String, dynamic>,
+        );
       }
     } catch (_) {}
     return null;
@@ -60,14 +62,16 @@ class UpdateChecker {
 
   static void triggerBackgroundCheck(List<String> args) {
     // Avoid running check recursively or during upgrade
-    if (args.isNotEmpty && (args.first == '_check_update' || args.first == 'upgrade')) {
+    if (args.isNotEmpty &&
+        (args.first == '_check_update' || args.first == 'upgrade')) {
       return;
     }
 
     final cache = readCache();
     final now = DateTime.now();
 
-    if (cache == null || now.difference(cache.lastChecked) > const Duration(hours: 24)) {
+    if (cache == null ||
+        now.difference(cache.lastChecked) > const Duration(hours: 24)) {
       _spawnBackgroundProcess();
     }
   }
@@ -89,12 +93,20 @@ class UpdateChecker {
     }
 
     try {
-      await Process.start(executable, backgroundArgs, mode: ProcessStartMode.detached);
+      await Process.start(
+        executable,
+        backgroundArgs,
+        mode: ProcessStartMode.detached,
+      );
     } catch (_) {}
   }
 
-  static void printUpdateNotificationIfNeeded(List<String> args, Logger logger) {
-    if (args.isNotEmpty && (args.first == '_check_update' || args.first == 'upgrade')) {
+  static void printUpdateNotificationIfNeeded(
+    List<String> args,
+    Logger logger,
+  ) {
+    if (args.isNotEmpty &&
+        (args.first == '_check_update' || args.first == 'upgrade')) {
       return;
     }
 
@@ -111,17 +123,35 @@ class UpdateChecker {
     } catch (_) {}
   }
 
-  static void _printUpdateNotification(String current, String latest, Logger logger) {
+  static void _printUpdateNotification(
+    String current,
+    String latest,
+    Logger logger,
+  ) {
     final title = 'A new version of zuq_cli is available!'.padRight(48);
     final versions = 'Current: $current → Latest: $latest'.padRight(48);
     final command = 'Run `zuq upgrade` to update.'.padRight(48);
 
     logger.info('');
-    logger.info(lightYellow.wrap('┌──────────────────────────────────────────────────────┐')!);
-    logger.info('${lightYellow.wrap('│')!}  ${lightCyan.wrap(title)}  ${lightYellow.wrap('│')!}');
-    logger.info('${lightYellow.wrap('│')!}  $versions  ${lightYellow.wrap('│')!}');
-    logger.info('${lightYellow.wrap('│')!}  ${lightGreen.wrap(command)}  ${lightYellow.wrap('│')!}');
-    logger.info(lightYellow.wrap('└──────────────────────────────────────────────────────┘')!);
+    logger.info(
+      lightYellow.wrap(
+        '┌──────────────────────────────────────────────────────┐',
+      )!,
+    );
+    logger.info(
+      '${lightYellow.wrap('│')!}  ${lightCyan.wrap(title)}    ${lightYellow.wrap('│')!}',
+    );
+    logger.info(
+      '${lightYellow.wrap('│')!}  $versions    ${lightYellow.wrap('│')!}',
+    );
+    logger.info(
+      '${lightYellow.wrap('│')!}    ${lightGreen.wrap(command)}  ${lightYellow.wrap('│')!}',
+    );
+    logger.info(
+      lightYellow.wrap(
+        '└──────────────────────────────────────────────────────┘',
+      )!,
+    );
     logger.info('');
   }
 }
