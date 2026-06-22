@@ -1,3 +1,9 @@
+## 1.0.5
+
+- Added background update checking and `zuq upgrade` command to simplify CLI updates.
+- Added customizable `features_path` config parameter to support alternative directory structures (such as `lib/modules` or `lib/src/features`) for both scaffolding and boundary doctor audits.
+- Refactored `zuq init` configuration detection to dynamically parse and preserve existing `modules`, `presets`, and `features_path` properties without overwriting them.
+
 ## 1.0.4
 
 - Split feature domain model into a pure domain entity and a serialization-aware model in the data layer.

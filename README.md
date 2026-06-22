@@ -126,15 +126,40 @@ Data          →  Presentation ✗
 
 ---
 
+### `zuq init` — Initialize configuration for an existing project
+
+Generates a `zuq.yaml` config file by auto-detecting the project's name, state management libraries, and routing setup. This allows you to adopt `zuq` on an already existing Flutter codebase.
+
+```bash
+zuq init [flags]
+```
+
+| Flag | Short | Description |
+| :--- | :---: | :--- |
+| `--force` | `-f` | Overwrite an existing `zuq.yaml` without prompting |
+
+---
+
+### `zuq upgrade` — Upgrade the CLI tool
+
+Upgrades `zuq_cli` to the latest version published on pub.dev.
+
+```bash
+zuq upgrade
+```
+
+---
+
 ## Configuration — `zuq.yaml`
 
-Created automatically on `zuq create`. Referenced by all subsequent `zuq add` commands.
+Created automatically on `zuq create` or `zuq init`. Referenced by all subsequent `zuq add` commands.
 
 ```yaml
 name: my_app
 state_management: bloc
 router: go_router
 preset: default
+features_path: lib/features # Optional custom features folder location (e.g. lib/modules)
 modules:
   - storage
   - analytics
