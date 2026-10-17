@@ -11,14 +11,12 @@ class NetworkingModule implements Module {
   String get id => 'networking';
 
   @override
-  List<String> get dependencies => ['storage', 'analytics'];
+  List<String> get dependencies => ['storage', 'analytics', 'config'];
 
   @override
   Future<void> install(ProjectContext context) async {
     // - Request required packages
     context.corePackages.addAll(['dio', 'flutter_secure_storage', 'logger']);
-
-    final isRiverpod = context.stateManagement == 'riverpod';
 
     final templatesPath = TemplatesLocator.getTemplatesPath();
     final brickPath = p.join(
@@ -30,7 +28,10 @@ class NetworkingModule implements Module {
     final generator = await MasonGenerator.fromBrick(brick);
 
     final variables = <String, dynamic>{
-      'isRiverpod': isRiverpod,
+      'isRiverpod': context.stateManagement == 'riverpod',
+      'isBloc': context.stateManagement == 'bloc',
+      'isProvider': context.stateManagement == 'provider',
+      'isNone': context.stateManagement == 'none',
     };
 
     final target = DirectoryGeneratorTarget(Directory(context.libPath));

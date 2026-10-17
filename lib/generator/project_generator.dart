@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:zuq_cli/core/module/base/module.dart';
 import 'package:zuq_cli/core/module/base/project_context.dart';
+import 'package:zuq_cli/core/module/config_module.dart';
 import 'package:zuq_cli/core/module/networking_module.dart';
 import 'package:zuq_cli/core/module/routing_module.dart';
 import 'package:zuq_cli/core/module/storage_module.dart';
@@ -36,21 +37,34 @@ class ProjectGenerator {
     required String projectName,
     required String stateManagement,
     required String router,
+    String? targetPath,
     String preset = 'default',
     List<String> platforms = const [],
   }) async {
-    _logger.info('Scaffolding project ${lightCyan.wrap(projectName)}...');
+    final projectPath = p.normalize(
+      targetPath ?? p.join(Directory.current.path, projectName),
+    );
+    final isCurrentDirectory =
+        projectPath == p.normalize(Directory.current.path);
+
+    _logger.info(
+      'Scaffolding project ${lightCyan.wrap(projectName)} in ${lightGray.wrap(projectPath)}...',
+    );
 
     // - Run flutter create
     final createProgress = _logger.progress('Running "flutter create"');
 
-    final List<String> args = ['create'];
+    final List<String> args = ['create', '--project-name=$projectName'];
     if (platforms.isNotEmpty) {
       args.add('--platforms=${platforms.join(',')}');
     }
-    args.add(projectName);
+    args.add(isCurrentDirectory ? '.' : projectName);
 
-    final createResult = await _processRunner.run('flutter', args);
+    final createResult = await _processRunner.run(
+      'flutter',
+      args,
+      workingDirectory: isCurrentDirectory ? projectPath : null,
+    );
 
     if (createResult.exitCode != 0) {
       print('Error Scaffolding project.');
@@ -60,12 +74,12 @@ class ProjectGenerator {
 
     createProgress.complete('Flutter project created.');
 
-    final projectPath = p.join(Directory.current.path, projectName);
     final libPath = p.join(projectPath, 'lib');
 
     // Build the dependency graph using DependencyResolver
     final resolver = DependencyResolver();
     final Map<String, Module> allModules = {
+      'config': ConfigModule(),
       'networking': NetworkingModule(),
       'routing': RoutingModule(),
       'storage': StorageModule(),
@@ -84,7 +98,13 @@ class ProjectGenerator {
         initialModules = ['routing', 'networking', 'storage', 'theme'];
         break;
       case 'ecommerce':
-        initialModules = ['routing', 'networking', 'storage', 'analytics', 'theme'];
+        initialModules = [
+          'routing',
+          'networking',
+          'storage',
+          'analytics',
+          'theme',
+        ];
         break;
       case 'default':
       default:
@@ -100,7 +120,9 @@ class ProjectGenerator {
       return 1;
     }
 
-    _logger.info('Resolved default modules installation order: ${installOrder.join(' -> ')}');
+    _logger.info(
+      'Resolved default modules installation order: ${installOrder.join(' -> ')}',
+    );
 
     // - Create a local zuq.yaml inside the new project for future commands
     final configProgress = _logger.progress('Creating project config file');

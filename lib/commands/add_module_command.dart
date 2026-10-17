@@ -12,6 +12,7 @@ import 'package:zuq_cli/core/module/networking_module.dart';
 import 'package:zuq_cli/core/module/routing_module.dart';
 import 'package:zuq_cli/core/module/storage_module.dart';
 import 'package:zuq_cli/core/module/theme_module.dart';
+import 'package:zuq_cli/core/module/config_module.dart';
 import 'package:zuq_cli/core/module/l10n_module.dart';
 import 'package:zuq_cli/core/module/analytics_module.dart';
 import 'package:zuq_cli/core/process_runner.dart';
@@ -29,6 +30,7 @@ class AddModuleCommand extends Command<int> {
   final String description = 'Add an installable module to the current project.';
 
   final Map<String, Module> _modules = {
+    'config': ConfigModule(),
     'networking': NetworkingModule(),
     'routing': RoutingModule(),
     'storage': StorageModule(),
