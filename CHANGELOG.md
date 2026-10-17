@@ -1,3 +1,16 @@
+## 1.0.7
+
+- Added global `--version` (`-v`) flag to print the current installed version of `zuq_cli`.
+
+## 1.0.6
+
+- Fixed `zuq create .` scaffolding in current directory: resolved broken package imports (`package:///...`) and empty project paths by adding `ProjectNameResolver` with automated Dart package identifier sanitization and discovery.
+- Added `--name` (`-n`) flag to `zuq create` to allow overriding the package name when creating in the current directory or a subfolder.
+- Decoupled `AppTypography` into an extensible `ThemeExtension` supporting runtime `GoogleFonts` resolvers, local `.ttf`/`.otf` asset fonts, and bidirectional synchronization with Flutter Material 3 `TextTheme`.
+- Added `config` module providing type-safe `AppConfig`, `AppEnvironment` (`dev`, `stage`, `prod`), `--dart-define` compilation overrides, and tailored state management providers (`configProvider` for Riverpod, `ConfigCubit` for BLoC, `ConfigNotifier` for Provider, and `ConfigHolder` for None).
+- Refactored networking module: removed empty `NetworkService` wrapper and hardcoded URLs in `NetworkConstants`; injected `AppConfig` and `SecureStorageService` into canonical `createDio` and provided idiomatic `dioProvider` across all supported state management solutions.
+- Added `--version` (`-v`) global flag to print current CLI version.
+
 ## 1.0.5
 
 - Added background update checking and `zuq upgrade` command to simplify CLI updates.

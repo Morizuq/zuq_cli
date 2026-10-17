@@ -34,19 +34,29 @@ dart pub global activate --source path .
 ### `zuq create` — Bootstrap a project
 
 ```bash
-zuq create <project_name> [flags]
+zuq create <project_name_or_directory> [flags]
+```
+
+You can create a project in a new folder or directly in the current directory:
+
+```bash
+# Create in a new subfolder
+zuq create my_app --state riverpod --router go_router
+
+# Scaffold directly into the current directory
+zuq create . --state bloc
+
+# Scaffold in current directory with an explicit package name override
+zuq create . --name custom_app --state provider
 ```
 
 | Flag | Short | Values | Default | Description |
 | :--- | :---: | :--- | :---: | :--- |
+| `--name` | `-n` | `<package_name>` | Folder name | Dart package identifier override |
 | `--state` | `-s` | `bloc` `riverpod` `provider` `none` | `none` | State management library |
 | `--router` | `-r` | `go_router` `auto_route` | `go_router` | Routing solution |
 | `--preset` | `-p` | `default` `fintech` `ecommerce` | `default` | Architectural template |
 | `--platforms` | | `android` `ios` `web` `macos` `linux` `windows` | `android,ios` | Target platforms |
-
-```bash
-zuq create my_app --state bloc --router go_router --platforms android ios web
-```
 
 If flags are omitted in an interactive terminal, Zuq will prompt you.
 
@@ -88,14 +98,15 @@ zuq add module <module_name>
 
 | Module | Depends on | What it sets up |
 | :--- | :--- | :--- |
-| `networking` | `storage`, `analytics` | Dio client, interceptors, error handling |
+| `config` | — | Multi-environment config (`dev`/`stage`/`prod`), `--dart-define` parsing, and state-managed `AppConfig` providers |
+| `networking` | `storage`, `analytics`, `config` | Canonical `Dio` client, environment baseUrl injection, interceptors, error handling |
 | `storage` | — | Secure and local storage utilities |
 | `routing` | — | Router setup based on your GoRouter/AutoRoute choice |
-| `theme` | — | Dark/light mode token structure |
+| `theme` | — | Dark/light mode token structure, dynamic `GoogleFonts` and local TTF support |
 | `l10n` | — | Localization resource structure |
 | `analytics` | — | Core telemetry tracking layout |
 
-> **Topological ordering** — adding `networking` automatically installs `storage` and `analytics` first, in the correct order.
+> **Topological ordering** — adding `networking` automatically installs `storage`, `analytics`, and `config` first, in the correct order.
 
 ---
 

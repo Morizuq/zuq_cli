@@ -2,22 +2,32 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:path/path.dart' as p;
 import 'package:zuq_cli/core/config/config_parser.dart';
+import 'package:zuq_cli/core/config/project_name_resolver.dart';
 import 'package:zuq_cli/generator/project_generator.dart';
 
 class CreateCommand extends Command<int> {
   final ProjectGenerator _projectGenerator;
   final ConfigParser _configParser;
+  final ProjectNameResolver _projectNameResolver;
   final Logger _logger;
+
   CreateCommand({
     ProjectGenerator? projectGenerator,
     ConfigParser configParser = const ConfigParser(),
+    ProjectNameResolver projectNameResolver = const ProjectNameResolver(),
     Logger? logger,
   }) : _projectGenerator =
            projectGenerator ?? ProjectGenerator(logger: Logger()),
        _configParser = configParser,
+       _projectNameResolver = projectNameResolver,
        _logger = logger ?? Logger() {
-    // Add state management choise option
+    argParser.addOption(
+      'name',
+      abbr: 'n',
+      help: 'The Dart package name for the project (defaults to folder name when creating in current directory).',
+    );
 
     argParser.addOption(
       'state',
@@ -59,15 +69,27 @@ class CreateCommand extends Command<int> {
   @override
   Future<int> run() async {
     if (argResults == null || argResults!.rest.isEmpty) {
-      _logger.err('Error: Please specifiy project name');
-      _logger.info('Usage: zuq create <project_name>');
+      _logger.err('Error: Please specify project name or directory target (e.g. zuq create my_app or zuq create .)');
+      _logger.info('Usage: zuq create <project_name_or_target_directory>');
       return 1;
     }
 
-    final projectName = argResults!.rest.first;
+    final rawTarget = argResults!.rest.first;
+    final explicitName = argResults?['name'] as String?;
+
+    final isCurrentDirectory = rawTarget == '.' || rawTarget.trim().isEmpty;
+    final targetPath = isCurrentDirectory
+        ? Directory.current.path
+        : p.normalize(p.join(Directory.current.path, rawTarget));
+
+    final resolvedProjectName = _projectNameResolver.resolve(
+      rawTarget: rawTarget,
+      overrideName: explicitName,
+      currentDirectory: Directory(targetPath),
+    );
 
     final fileConfig = _configParser.readConfig(
-      fallbackProjectName: projectName,
+      fallbackProjectName: resolvedProjectName,
     );
 
     final String finalState;
@@ -85,7 +107,7 @@ class CreateCommand extends Command<int> {
       _logger.info(
         'No configuration file found. Using command line arguments.',
       );
-      finalName = projectName;
+      finalName = resolvedProjectName;
 
       final results = argResults;
       if (results != null) {
@@ -147,6 +169,7 @@ class CreateCommand extends Command<int> {
 
     return await _projectGenerator.generate(
       projectName: finalName,
+      targetPath: targetPath,
       stateManagement: finalState,
       router: finalRouter,
       preset: finalPreset,
