@@ -1,3 +1,7 @@
+## 1.0.7
+
+- Added global `--version` (`-v`) flag to print the current installed version of `zuq_cli`.
+
 ## 1.0.6
 
 - Fixed `zuq create .` scaffolding in current directory: resolved broken package imports (`package:///...`) and empty project paths by adding `ProjectNameResolver` with automated Dart package identifier sanitization and discovery.
