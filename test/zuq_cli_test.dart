@@ -1,4 +1,5 @@
 import 'package:test/test.dart';
+import 'package:zuq_cli/core/cli.dart';
 import 'package:zuq_cli/core/config/project_config.dart';
 import 'package:zuq_cli/core/utils/dependency_resolver.dart';
 
@@ -106,6 +107,20 @@ void main() {
       expect(config.preset, equals('default'));
       expect(config.featuresPath, equals('lib/features'));
       expect(config.modules, isEmpty);
+    });
+  });
+
+  group('ZuqCli', () {
+    test('prints version with --version flag', () async {
+      final cli = ZuqCli();
+      final exitCode = await cli.run(['--version']);
+      expect(exitCode, equals(0));
+    });
+
+    test('prints version with -v flag', () async {
+      final cli = ZuqCli();
+      final exitCode = await cli.run(['-v']);
+      expect(exitCode, equals(0));
     });
   });
 }

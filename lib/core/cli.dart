@@ -7,6 +7,7 @@ import 'package:zuq_cli/commands/upgrade_command.dart';
 import 'package:zuq_cli/commands/check_update_command.dart';
 import 'package:zuq_cli/commands/init_command.dart';
 import 'package:zuq_cli/core/utils/update_checker.dart';
+import 'package:zuq_cli/core/version.dart';
 
 class ZuqCli {
   final CommandRunner<int> runner;
@@ -18,6 +19,12 @@ class ZuqCli {
         'zuq',
         'A custom developer CLI for streamling flutter workflows.',
       ) {
+    runner.argParser.addFlag(
+      'version',
+      abbr: 'v',
+      negatable: false,
+      help: 'Print the current version of zuq_cli.',
+    );
     runner.addCommand(CreateCommand(logger: _logger));
     runner.addCommand(AddCommand(logger: _logger));
     runner.addCommand(DoctorCommand(logger: _logger));
@@ -29,10 +36,16 @@ class ZuqCli {
   // Entry point to execute commands
   Future<int> run(List<String> args) async {
     try {
+      final argResults = runner.parse(args);
+      if (argResults['version'] == true) {
+        _logger.info('zuq version: $packageVersion');
+        return 0;
+      }
+
       // Trigger background update check (async, does not block)
       UpdateChecker.triggerBackgroundCheck(args);
 
-      final exitCode = await runner.run(args);
+      final exitCode = await runner.runCommand(argResults);
 
       // Print update notification if a newer version is cached
       UpdateChecker.printUpdateNotificationIfNeeded(args, _logger);

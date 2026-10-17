@@ -5,6 +5,7 @@
 - Decoupled `AppTypography` into an extensible `ThemeExtension` supporting runtime `GoogleFonts` resolvers, local `.ttf`/`.otf` asset fonts, and bidirectional synchronization with Flutter Material 3 `TextTheme`.
 - Added `config` module providing type-safe `AppConfig`, `AppEnvironment` (`dev`, `stage`, `prod`), `--dart-define` compilation overrides, and tailored state management providers (`configProvider` for Riverpod, `ConfigCubit` for BLoC, `ConfigNotifier` for Provider, and `ConfigHolder` for None).
 - Refactored networking module: removed empty `NetworkService` wrapper and hardcoded URLs in `NetworkConstants`; injected `AppConfig` and `SecureStorageService` into canonical `createDio` and provided idiomatic `dioProvider` across all supported state management solutions.
+- Added `--version` (`-v`) global flag to print current CLI version.
 
 ## 1.0.5
 
