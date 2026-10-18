@@ -1,3 +1,9 @@
+## 1.0.8
+
+- Fixed `AuthInterceptor` in networking module template: injected dynamic `baseUrl` from `AppConfig` and eliminated missing symbol errors from deprecated `NetworkConstants.baseUrl`.
+- Optimized request retries in `AuthInterceptor`: reused `_refreshDio.fetch` preserving original request options, timeouts, and cancellation tokens while preventing socket leaks and repeated `Dio` client instantiation.
+- Updated `createDio` in networking template to pass `baseUrl: config.apiBaseUrl` into `AuthInterceptor`.
+
 ## 1.0.7
 
 - Added global `--version` (`-v`) flag to print the current installed version of `zuq_cli`.
