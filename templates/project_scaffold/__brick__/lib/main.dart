@@ -288,27 +288,6 @@ class _HomeScreenState extends {{#isRiverpod}}ConsumerState<HomeScreen>{{/isRive
                     ),
                   ),
                 ),
-                AppSpacing.vXL,
-
-                // Tech stack info pill
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.m,
-                    vertical: AppSpacing.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: brandColors.subtle,
-                    borderRadius: AppBorderRadius.pill,
-                  ),
-                  child: Text(
-                    'State: {{stateName}}  •  Router: {{routerName}}',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: brandColors.mid,
-                      fontWeight: AppFontWeight.medium,
-                      letterSpacing: AppLetterSpacing.label,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

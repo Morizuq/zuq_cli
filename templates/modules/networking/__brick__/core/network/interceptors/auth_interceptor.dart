@@ -7,17 +7,22 @@ import '../network_constants.dart';
 /// Attaches Bearer token to requests and manages queued token refresh on 401.
 class AuthInterceptor extends QueuedInterceptor {
   final SecureStorageService secureStorage;
+  final String baseUrl;
   final Dio _refreshDio;
 
-  AuthInterceptor(this.secureStorage)
-    : _refreshDio = Dio(
-        BaseOptions(
-          baseUrl: NetworkConstants.baseUrl,
-          connectTimeout: NetworkConstants.connectTimeout,
-          receiveTimeout: NetworkConstants.receiveTimeout,
-          sendTimeout: NetworkConstants.sendTimeout,
-        ),
-      );
+  AuthInterceptor({
+    required this.secureStorage,
+    required this.baseUrl,
+    Dio? refreshDio,
+  }) : _refreshDio = refreshDio ??
+            Dio(
+              BaseOptions(
+                baseUrl: baseUrl,
+                connectTimeout: NetworkConstants.connectTimeout,
+                receiveTimeout: NetworkConstants.receiveTimeout,
+                sendTimeout: NetworkConstants.sendTimeout,
+              ),
+            );
 
   @override
   Future<void> onRequest(
@@ -109,25 +114,6 @@ class AuthInterceptor extends QueuedInterceptor {
   ) async {
     requestOptions.headers['Authorization'] = 'Bearer $accessToken';
 
-    final retryDio = Dio(
-      BaseOptions(
-        baseUrl: NetworkConstants.baseUrl,
-        connectTimeout: NetworkConstants.connectTimeout,
-        receiveTimeout: NetworkConstants.receiveTimeout,
-        sendTimeout: NetworkConstants.sendTimeout,
-      ),
-    );
-
-    return retryDio.request<dynamic>(
-      requestOptions.path,
-      data: requestOptions.data,
-      queryParameters: requestOptions.queryParameters,
-      options: Options(
-        method: requestOptions.method,
-        headers: requestOptions.headers,
-        responseType: requestOptions.responseType,
-        contentType: requestOptions.contentType,
-      ),
-    );
+    return _refreshDio.fetch<dynamic>(requestOptions);
   }
 }

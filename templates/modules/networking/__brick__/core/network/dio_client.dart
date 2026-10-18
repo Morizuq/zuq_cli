@@ -65,7 +65,12 @@ Dio createDio({
     ),
   );
 
-  dio.interceptors.add(AuthInterceptor(secureStorage));
+  dio.interceptors.add(
+    AuthInterceptor(
+      secureStorage: secureStorage,
+      baseUrl: config.apiBaseUrl,
+    ),
+  );
 
   if (config.enableLogging) {
     dio.interceptors.add(AppLoggingInterceptor());
